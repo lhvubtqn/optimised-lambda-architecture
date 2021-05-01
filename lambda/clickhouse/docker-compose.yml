@@ -6,12 +6,10 @@ networks:
       name: lambda-network
 
 services:
-  server:
+  clickhouse:
     image: yandex/clickhouse-server:20.8
+    container_name: clickhouse
     ports:
       - "8123:8123"
       - "9000:9000"
       - "9009:9009"
-  client:
-    image: yandex/clickhouse-client:20.8
-    command: ["--host", "server"]
