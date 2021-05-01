@@ -1,0 +1,132 @@
+{
+  "type": "record",
+  "name": "datagen",
+  "fields": [
+    {
+      "name": "REQ_TIME",
+      "type": {
+        "type": "string",
+        "format_as_time": "unix_long",
+        "arg.properties": {
+          "options": [
+            "2020-11-17 19:01:32"
+          ]
+        }
+      }
+    },
+    {
+      "name": "APP_ID",
+      "type": {
+        "type": "string",
+        "arg.properties": {
+          "regex": "[0-2][0-9]*",
+          "length": 2
+        }
+      }
+    },
+    {
+      "name": "USER_ID",
+      "type": {
+        "type": "string",
+        "arg.properties": {
+          "regex": "[0-9]*",
+          "length": 2
+        }
+      }
+    },
+    {
+      "name": "TRANSACTION_ID",
+      "type": {
+        "type": "string",
+        "arg.properties": {
+          "regex": "[0-9]*",
+          "length": 15
+        }
+      }
+    },
+    {
+      "name": "STATUS",
+      "type": {
+        "type": "int",
+        "arg.properties": {
+          "options": [
+            100,
+            200
+          ]
+        }
+      }
+    },
+    {
+      "name": "EMBEDDED_DATA",
+      "type": {
+        "type": "string",
+        "arg.properties": {
+          "options": [
+            "embedded_data"
+          ]
+        }
+      }
+    },
+    {
+      "name": "LAST_UPDATED_TIME",
+      "type": {
+        "type": "long",
+        "format_as_time": "unix_long",
+        "arg.properties": {
+          "range": {
+            "min": 1577836800000,
+            "max": 1609372800000
+          }
+        }
+      }
+    },
+    {
+      "name": "AMOUNT",
+      "type": {
+        "type": "int",
+        "arg.properties": {
+          "range": {
+            "min": 100000,
+            "max": 1000000
+          }
+        }
+      }
+    },
+    {
+      "name": "FEE_AMOUNT",
+      "type": {
+        "type": "int",
+        "arg.properties": {
+          "range": {
+            "min": 1000,
+            "max": 10000
+          }
+        }
+      }
+    },
+    {
+      "name": "DISCOUNT_AMOUNT",
+      "type": {
+        "type": "int",
+        "arg.properties": {
+          "range": {
+            "min": 10000,
+            "max": 100000
+          }
+        }
+      }
+    },
+    {
+      "name": "CHARGE_AMOUNT",
+      "type": {
+        "type": "int",
+        "arg.properties": {
+          "range": {
+            "min": 1000000,
+            "max": 10000000
+          }
+        }
+      }
+    }
+  ]
+}
