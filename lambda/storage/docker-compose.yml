@@ -16,7 +16,7 @@ services:
       - "MAX_HEAP_SIZE=256M"
       - "HEAP_NEWSIZE=128M"
     volumes:
-      - ../../apps/iot-spark-processor/data/IoTData.cql:/schema.cql
+      - ./configs/IoTData.cql:/schema.cql
 
   namenode:
     image: bde2020/hadoop-namenode:1.1.0-hadoop2.8-java8

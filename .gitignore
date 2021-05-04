@@ -1,1 +1,9 @@
 lambda/kafka/datagen/plugins
+
+**/target/
+
+dependency-reduced-pom.xml
+
+.idea
+
+.vscode
