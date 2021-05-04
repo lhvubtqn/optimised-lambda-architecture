@@ -45,7 +45,7 @@ public class BatchTrafficDataProcessor {
                         new AggregateKey(iot.getRouteId(), iot.getVehicleType()),
                         1L
                 ))
-                .reduceByKey((a, b) -> a + b);
+                .reduceByKey(Long::sum);
 
         JavaRDD<TotalTrafficData> trafficDStream = countDStreamPair
                 .map(BatchTrafficDataProcessor::transformToTotalTrafficData);
@@ -55,7 +55,7 @@ public class BatchTrafficDataProcessor {
 
     private static void persistTotalTraffic(JavaRDD<TotalTrafficData> trafficDStream) {
         // Map Cassandra table column
-        Map<String, String> columnNameMappings = new HashMap<String, String>();
+        Map<String, String> columnNameMappings = new HashMap<>();
         columnNameMappings.put("routeId", "routeid");
         columnNameMappings.put("vehicleType", "vehicletype");
         columnNameMappings.put("totalCount", "totalcount");
@@ -164,7 +164,7 @@ public class BatchTrafficDataProcessor {
 
     private static void persistPOI(JavaRDD<POITrafficData> trafficDStream) {
         // Map Cassandra table column
-        Map<String, String> columnNameMappings = new HashMap<String, String>();
+        Map<String, String> columnNameMappings = new HashMap<>();
         columnNameMappings.put("vehicleId", "vehicleid");
         columnNameMappings.put("distance", "distance");
         columnNameMappings.put("vehicleType", "vehicletype");
@@ -187,8 +187,8 @@ public class BatchTrafficDataProcessor {
                         iot.getRouteId().equals(broadcastPOIValues.value().getRoute())
                                 && iot.getVehicleType().contains(broadcastPOIValues.value().getVehicle())
                                 && GeoDistanceCalculator.isInPOIRadius(
-                                Double.valueOf(iot.getLatitude()),
-                                Double.valueOf(iot.getLongitude()),
+                                Double.parseDouble(iot.getLatitude()),
+                                Double.parseDouble(iot.getLongitude()),
                                 broadcastPOIValues.value().getLatitude(),
                                 broadcastPOIValues.value().getLongitude(),
                                 broadcastPOIValues.value().getRadius()
@@ -197,7 +197,7 @@ public class BatchTrafficDataProcessor {
     }
 
     //Function to create TotalTrafficData object from IoT data
-    private static final TotalTrafficData transformToTotalTrafficData(Tuple2<AggregateKey, Long> tuple) {
+    private static TotalTrafficData transformToTotalTrafficData(Tuple2<AggregateKey, Long> tuple) {
         logger.debug("Total Count : " + "key " + tuple._1().getRouteId() + "-" + tuple._1().getVehicleType() + " value " + tuple._2());
         TotalTrafficData trafficData = new TotalTrafficData();
         trafficData.setRouteId(tuple._1().getRouteId());
@@ -206,7 +206,7 @@ public class BatchTrafficDataProcessor {
         trafficData.setTimeStamp(new Date());
         trafficData.setRecordDate(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
         return trafficData;
-    };
+    }
 
     //Function to create WindowTrafficData object from IoT data
     private static final Function<Tuple2<AggregateKey, Long>, WindowTrafficData> windowTrafficDataFunc = (tuple -> {
@@ -227,9 +227,9 @@ public class BatchTrafficDataProcessor {
         poiTraffic.setVehicleType(tuple._1.getVehicleType());
         poiTraffic.setTimeStamp(new Date());
         double distance = GeoDistanceCalculator.getDistance(
-                Double.valueOf(tuple._1.getLatitude()).doubleValue(),
-                Double.valueOf(tuple._1.getLongitude()).doubleValue(),
-                tuple._2.getLatitude(), tuple._2.getLongitude()
+            Double.parseDouble(tuple._1.getLatitude()),
+            Double.parseDouble(tuple._1.getLongitude()),
+            tuple._2.getLatitude(), tuple._2.getLongitude()
         );
         logger.debug("Distance for " + tuple._1.getLatitude() + "," + tuple._1.getLongitude() + "," + tuple._2.getLatitude() + "," + tuple._2.getLongitude() + " = " + distance);
         poiTraffic.setDistance(distance);

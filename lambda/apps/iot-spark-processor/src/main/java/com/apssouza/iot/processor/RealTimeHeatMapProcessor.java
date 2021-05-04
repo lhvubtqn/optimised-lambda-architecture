@@ -8,11 +8,9 @@ import com.apssouza.iot.dto.IoTData;
 
 import org.apache.spark.streaming.Durations;
 import org.apache.spark.streaming.api.java.JavaDStream;
-import org.apache.spark.streaming.api.java.JavaPairDStream;
 
 import scala.Tuple2;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,12 +25,12 @@ import static com.datastax.spark.connector.japi.CassandraStreamingJavaUtil.javaF
 public class RealTimeHeatMapProcessor {
 
 
-    public static void processHeatMap(JavaDStream<IoTData> streaming) throws IOException {
+    public static void processHeatMap(JavaDStream<IoTData> streaming) {
         JavaDStream<HeatMapData> heatMapStream = streaming
                 .map(RealTimeHeatMapProcessor::mapToMeasurement)
                 .map(RealTimeHeatMapProcessor::roundCoordinates)
                 .mapToPair(measurement -> new Tuple2<>(measurement.getRoundedCoordinate(), 1))
-                .reduceByKeyAndWindow((a, b) -> a + b, Durations.seconds(30), Durations.seconds(10))
+                .reduceByKeyAndWindow(Integer::sum, Durations.seconds(30), Durations.seconds(10))
                 .map(RealTimeHeatMapProcessor::mapHeatMap);
 
         save(heatMapStream);
@@ -57,12 +55,12 @@ public class RealTimeHeatMapProcessor {
      * rounded up, so a coordinate on (-0.00025,0) will be rounded to (0,0), while the coordinate (0.00025,0) will be
      * rounded to (0.0005,0).
      *
-     * @param measurement
+     * @param measurement actual measurement
      * @return A set of measurements with rounded coordinates
      */
     private static Measurement roundCoordinates(Measurement measurement) {
-        double roundedLatitude = 5 * Math.round(measurement.getCoordinate().getLatitude() * 10000 / 5) / 10000;
-        double roundedLongitude = 5 * Math.round(measurement.getCoordinate().getLongitude() * 10000 / 5) / 10000;
+        double roundedLatitude = 5.0 * Math.round(measurement.getCoordinate().getLatitude() * 10000 / 5) / 10000;
+        double roundedLongitude = 5.0 * Math.round(measurement.getCoordinate().getLongitude() * 10000 / 5) / 10000;
 
         Coordinate roundedCoordinate = new Coordinate(roundedLatitude, roundedLongitude);
         measurement.setRoundedCoordinate(roundedCoordinate);

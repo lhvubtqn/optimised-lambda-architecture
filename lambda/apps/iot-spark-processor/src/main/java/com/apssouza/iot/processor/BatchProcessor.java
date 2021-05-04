@@ -8,7 +8,6 @@ import com.datastax.spark.connector.util.JavaApiHelper;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.broadcast.Broadcast;
-import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -26,10 +25,10 @@ public class BatchProcessor {
     public static void main(String[] args) throws Exception {
 //        Properties prop = PropertyFileReader.readPropertyFile("iot-spark-local.properties");
          Properties prop = PropertyFileReader.readPropertyFile("iot-spark.properties");
-        String[] jars = {prop.getProperty("com.iot.app.jar")};
         String file = prop.getProperty("com.iot.app.hdfs") + "iot-data-parque";
-        SparkConf conf = getSparkConfig(prop, jars);
+        SparkConf conf = getSparkConfig(prop);
         SparkSession sparkSession = SparkSession.builder().config(conf).getOrCreate();
+
         //broadcast variables. We will monitor vehicles on Route 37 which are of type Truck
         //Basically we are sending the data to each worker nodes on a Spark cluster.
         ClassTag<POIData> classTag = JavaApiHelper.getClassTag(POIData.class);
@@ -78,7 +77,7 @@ public class BatchProcessor {
     }
 
 
-    private static SparkConf getSparkConfig(Properties prop, String[] jars) {
+    private static SparkConf getSparkConfig(Properties prop) {
         return new SparkConf()
                 .set("spark.cassandra.connection.host", prop.getProperty("com.iot.app.cassandra.host"))
                 .set("spark.cassandra.connection.port", prop.getProperty("com.iot.app.cassandra.port"))

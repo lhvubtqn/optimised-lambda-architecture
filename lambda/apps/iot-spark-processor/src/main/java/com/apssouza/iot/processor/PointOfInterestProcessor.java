@@ -62,9 +62,9 @@ public class PointOfInterestProcessor {
 
     /**
      * Filter by routeId,vehicleType and in POI range
-     * @param iot
-     * @param broadcastPOIValues
-     * @return
+     * @param iot IoT data
+     * @param broadcastPOIValues the broadcast POI data
+     * @return true if the IoT data location is in POI data radius
      */
     private static boolean filterVehicleInPOI(IoTData iot, Broadcast<POIData> broadcastPOIValues){
         // Filter by routeId
@@ -98,9 +98,9 @@ public class PointOfInterestProcessor {
         poiTraffic.setVehicleType(tuple._1.getVehicleType());
         poiTraffic.setTimeStamp(new Date());
         double distance = GeoDistanceCalculator.getDistance(
-                Double.valueOf(tuple._1.getLatitude()).doubleValue(),
-                Double.valueOf(tuple._1.getLongitude()).doubleValue(),
-                tuple._2.getLatitude(), tuple._2.getLongitude()
+            Double.parseDouble(tuple._1.getLatitude()),
+            Double.parseDouble(tuple._1.getLongitude()),
+            tuple._2.getLatitude(), tuple._2.getLongitude()
         );
         logger.debug("Distance for " + tuple._1.getLatitude() + "," + tuple._1.getLongitude() + "," +
                 tuple._2.getLatitude() + "," + tuple._2.getLongitude() + " = " + distance);

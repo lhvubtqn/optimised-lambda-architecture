@@ -172,10 +172,10 @@ public class StreamProcessor implements Serializable {
     /**
      * Create tuple (IotData, boolean) the boolean will  be defined to true if iot object exists in the state
      *
-     * @param str
-     * @param iot
-     * @param state
-     * @return
+     * @param str str
+     * @param iot iot
+     * @param state state
+     * @return tuple2 between IoTData & Boolean
      */
     private static Tuple2<IoTData, Boolean> updateState(String str, Optional<IoTData> iot, State<Boolean> state) {
         Tuple2<IoTData, Boolean> vehicle = new Tuple2<>(iot.get(), false);

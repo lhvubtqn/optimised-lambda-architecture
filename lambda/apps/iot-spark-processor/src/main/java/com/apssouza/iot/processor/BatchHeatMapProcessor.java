@@ -12,7 +12,6 @@ import org.apache.spark.api.java.JavaRDD;
 
 import scala.Tuple2;
 
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,13 +26,13 @@ import java.util.concurrent.TimeUnit;
  */
 public class BatchHeatMapProcessor {
 
-    public static void processHeatMap(JavaRDD<IoTData> dataFrame) throws IOException {
+    public static void processHeatMap(JavaRDD<IoTData> dataFrame) {
         JavaRDD<Measurement> measurements = transformToMeasurements(dataFrame);
         JavaRDD<Measurement> roundedCoordinates = roundCoordinates(measurements);
         Date minTimestamp = measurements.min(new TimestampComparator()).getTimestamp();
         Date maxTimestamp = measurements.max(new TimestampComparator()).getTimestamp();
-        long diffInMillies = Math.abs(minTimestamp.getTime() - maxTimestamp.getTime());
-        long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+        long diffInMs = Math.abs(minTimestamp.getTime() - maxTimestamp.getTime());
+        long diff = TimeUnit.DAYS.convert(diffInMs, TimeUnit.MILLISECONDS);
         Calendar c = Calendar.getInstance();
         c.setTime(minTimestamp);
         c.set(Calendar.HOUR_OF_DAY, 0);
@@ -92,8 +91,8 @@ public class BatchHeatMapProcessor {
     private static JavaRDD<Measurement> transformToMeasurements(JavaRDD<IoTData> iotData) {
         return iotData.map(row -> {
             Coordinate coordinate = new Coordinate(
-                    Double.valueOf(row.getLatitude()),
-                    Double.valueOf(row.getLongitude())
+                    Double.parseDouble(row.getLatitude()),
+                    Double.parseDouble(row.getLongitude())
             );
             return new Measurement(coordinate, row.getTimestamp());
         });
@@ -127,10 +126,9 @@ public class BatchHeatMapProcessor {
      * @return A set of measurements in the given time period
      */
     private static  JavaRDD<Measurement> filterByTime(JavaRDD<Measurement> measurements, Date start, Date end) {
-        return measurements.filter(measurement -> {
-            return measurement.getTimestamp().after(start)
-                    && measurement.getTimestamp().before(end);
-        });
+        return measurements.filter(
+            measurement -> measurement.getTimestamp().after(start) && measurement.getTimestamp().before(end)
+        );
     }
 
     /**
@@ -142,7 +140,7 @@ public class BatchHeatMapProcessor {
     private static  JavaPairRDD<Coordinate, Integer> countPerGridBox(JavaRDD<Measurement> measurements) {
         return measurements.mapToPair(
                 measurement -> new Tuple2<>(measurement.getRoundedCoordinate(), 1)
-        ).reduceByKey((a, b) -> a + b);
+        ).reduceByKey(Integer::sum);
     }
 
 }

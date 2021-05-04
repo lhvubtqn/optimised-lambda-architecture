@@ -5,10 +5,8 @@ import static com.datastax.spark.connector.japi.CassandraStreamingJavaUtil.javaF
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.apache.spark.api.java.function.Function;
 import org.apache.spark.streaming.Durations;
 import org.apache.spark.streaming.State;
 import org.apache.spark.streaming.StateSpec;
@@ -41,7 +39,7 @@ public class RealtimeTrafficDataProcessor {
         // reduce by key and window (30 sec window and 10 sec slide).
         JavaDStream<WindowTrafficData> trafficDStream = filteredIotDataStream
                 .mapToPair(iot -> new Tuple2<>(new AggregateKey(iot.getRouteId(), iot.getVehicleType()), 1L))
-                .reduceByKeyAndWindow((a, b) -> a + b, Durations.seconds(30), Durations.seconds(10))
+                .reduceByKeyAndWindow(Long::sum, Durations.seconds(30), Durations.seconds(10))
                 .map(RealtimeTrafficDataProcessor::mapToWindowTrafficData);
 
         saveWindTrafficData(trafficDStream);
@@ -61,7 +59,7 @@ public class RealtimeTrafficDataProcessor {
         // We need to get count of vehicle group by routeId and vehicleType
         JavaDStream<TotalTrafficData> trafficDStream = filteredIotDataStream
                 .mapToPair(iot -> new Tuple2<>(new AggregateKey(iot.getRouteId(), iot.getVehicleType()), 1L))
-                .reduceByKey((a, b) -> a + b)
+                .reduceByKey(Long::sum)
                 .mapWithState(stateSpec)
                 .map(tuple2 -> tuple2)
                 .map(RealtimeTrafficDataProcessor::mapToTrafficData);
@@ -107,8 +105,8 @@ public class RealtimeTrafficDataProcessor {
     /**
      * Function to create WindowTrafficData object from IoT data
      *
-     * @param tuple
-     * @return
+     * @param tuple between AggregateKey & Long
+     * @return WindowTrafficData
      */
     private static WindowTrafficData mapToWindowTrafficData(Tuple2<AggregateKey, Long> tuple) {
         logger.debug("Window Count : " +
@@ -141,10 +139,10 @@ public class RealtimeTrafficDataProcessor {
     /**
      * Function to get running sum by maintaining the state
      *
-     * @param key
-     * @param currentSum
-     * @param state
-     * @return
+     * @param key key
+     * @param currentSum currentSum
+     * @param state state
+     * @return tuple 2 between AggregateKey and Long
      */
     private static Tuple2<AggregateKey, Long> updateState(
             AggregateKey key,
@@ -152,7 +150,7 @@ public class RealtimeTrafficDataProcessor {
             State<Long> state
     ) {
         Long objectOption = currentSum.get();
-        objectOption = objectOption == null ? 0l : objectOption;
+        objectOption = objectOption == null ? 0L : objectOption;
         long totalSum = objectOption + (state.exists() ? state.get() : 0);
         Tuple2<AggregateKey, Long> total = new Tuple2<>(key, totalSum);
         state.update(totalSum);

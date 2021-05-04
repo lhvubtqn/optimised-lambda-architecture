@@ -62,7 +62,7 @@ public class StreamingProcessor implements Serializable {
         String[] jars = {};
         String parqueFile = prop.getProperty("com.iot.app.hdfs") + "iot-data-parque";
         Map<String, Object> kafkaProperties = getKafkaParams(prop);
-        SparkConf conf = getSparkConf(prop, jars);
+        SparkConf conf = getSparkConf(prop);
 
         //batch interval of 5 seconds for incoming stream
         JavaStreamingContext streamingContext = new JavaStreamingContext(conf, Durations.seconds(5));
@@ -121,7 +121,7 @@ public class StreamingProcessor implements Serializable {
     /**
      * Commit the ack to kafka after process have completed
      *
-     * @param directKafkaStream
+     * @param directKafkaStream directKafkaStream
      */
     private void commitOffset(JavaInputDStream<ConsumerRecord<String, IoTData>> directKafkaStream) {
         directKafkaStream.foreachRDD((JavaRDD<ConsumerRecord<String, IoTData>> trafficRdd) -> {
@@ -169,7 +169,7 @@ public class StreamingProcessor implements Serializable {
         );
     }
 
-    private SparkConf getSparkConf(Properties prop, String[] jars) {
+    private SparkConf getSparkConf(Properties prop) {
         return new SparkConf()
                 .set("spark.cassandra.connection.host", prop.getProperty("com.iot.app.cassandra.host"))
                 .set("spark.cassandra.connection.port", prop.getProperty("com.iot.app.cassandra.port"))
