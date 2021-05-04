@@ -153,7 +153,7 @@ public class StreamingProcessor implements Serializable {
             Map<String, Object> kafkaProperties,
             Map<TopicPartition, Long> fromOffsets
     ) {
-        List<String> topicSet = Arrays.asList(new String[]{prop.getProperty("com.iot.app.kafka.topic")});
+        List<String> topicSet = Arrays.asList(prop.getProperty("com.iot.app.kafka.topic").split(","));
         if (fromOffsets.isEmpty()) {
             return KafkaUtils.createDirectStream(
                     streamingContext,
@@ -187,7 +187,7 @@ final class TrafficOffsetCommitCallback implements OffsetCommitCallback, Seriali
     @Override
     public void onComplete(Map<TopicPartition, OffsetAndMetadata> offsets, Exception exception) {
         log.info("---------------------------------------------------");
-        log.info(String.format("{0} | {1}", new Object[]{offsets, exception}));
+//        log.info(String.format("{0} | {1}", new Object[]{offsets, exception}));
         log.info("---------------------------------------------------");
     }
 }

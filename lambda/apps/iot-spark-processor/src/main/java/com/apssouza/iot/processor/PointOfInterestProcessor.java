@@ -68,16 +68,24 @@ public class PointOfInterestProcessor {
      */
     private static boolean filterVehicleInPOI(IoTData iot, Broadcast<POIData> broadcastPOIValues){
         // Filter by routeId
-        if (!iot.getRouteId().equals(broadcastPOIValues.value().getRoute())) {
+        if (
+            broadcastPOIValues.value().getRoute() != null
+                && !iot.getRouteId().equals(broadcastPOIValues.value().getRoute())
+        ) {
             return false;
         }
+
         // Filter by vehicleType
-        if (!iot.getVehicleType().contains(broadcastPOIValues.value().getVehicle())) {
+        if (
+            broadcastPOIValues.value().getVehicle() != null
+                && !iot.getVehicleType().contains(broadcastPOIValues.value().getVehicle())
+        ) {
             return false;
         }
+
         return GeoDistanceCalculator.isInPOIRadius(
-                Double.valueOf(iot.getLatitude()),
-                Double.valueOf(iot.getLongitude()),
+                Double.parseDouble(iot.getLatitude()),
+                Double.parseDouble(iot.getLongitude()),
                 broadcastPOIValues.value().getLatitude(),
                 broadcastPOIValues.value().getLongitude(),
                 broadcastPOIValues.value().getRadius()
