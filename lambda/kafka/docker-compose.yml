@@ -60,15 +60,3 @@ services:
       CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_SKIP_BACKLOG_MINUTES: 0
       CONFLUENT_METRICS_TOPIC_REPLICATION: 1
       PORT: 9021
-
-  datagen:
-    image: wurstmeister/kafka:2.13-2.6.0
-    container_name: datagen
-    depends_on:
-      - kafka
-      - control-center
-    ports:
-      - 8083:8083
-    volumes:
-      - ./datagen:/usr/share/datagen
-    command: connect-distributed.sh /usr/share/datagen/configs/datagen.properties
