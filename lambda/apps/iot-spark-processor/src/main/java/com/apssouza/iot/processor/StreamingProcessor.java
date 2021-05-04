@@ -171,8 +171,6 @@ public class StreamingProcessor implements Serializable {
 
     private SparkConf getSparkConf(Properties prop, String[] jars) {
         return new SparkConf()
-                .setAppName(prop.getProperty("com.iot.app.spark.app.name"))
-                .setMaster(prop.getProperty("com.iot.app.spark.master"))
                 .set("spark.cassandra.connection.host", prop.getProperty("com.iot.app.cassandra.host"))
                 .set("spark.cassandra.connection.port", prop.getProperty("com.iot.app.cassandra.port"))
                 .set("spark.cassandra.auth.username", prop.getProperty("com.iot.app.cassandra.username"))
