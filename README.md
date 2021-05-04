@@ -18,14 +18,12 @@ The architecture includes:
 
 - **Streaming Layer**: Apache Spark Streaming. Raw data from Kafka will be sent to this layer as a continuous stream and will be processed as minibatches. After process a minibatch, the layer will check if there are new data at the known folder in HDFS. If there are, the merging process will happen, that merges result data from Batch Layer, Streaming Layer and update the Serving Layer. This will ensure that the data in Serving Layer is eventually consistent.
 
-- **Serving Layer**: ClickHouse. Result data are stored in this layer. There will be some pre-computed view (that are called Materialized View in ClickHouse), that aggregates data when they are inserted to ClickHouse. These view will enhance the performance of queries. The dashboard application will get data from these view to visualize statistics. Admin can use ClickHouse client to query stats from ClickHouse directly.
+- **Serving Layer**: Cassandra. Result data are stored in this layer. There will be some pre-computed view (that are called Materialized View), that aggregates data when they are inserted to Cassandra. These view will enhance the performance of queries. The dashboard application will get data from these view to visualize statistics. Admin can use [Cassandra client](https://github.com/Kindrat/cassandra-client) to query stats from Cassandra directly.
 
 ### Flowchart
 
 Overall workflow of the system is described as follow:
 ![flowchart](./images/flowchart.png)
-
-### ClickHouse Model Design
 
 ## Performance Testing
 
