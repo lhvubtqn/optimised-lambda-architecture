@@ -2,7 +2,7 @@
 
 Inspired by this awesome [paper](https://cds.cern.ch/record/2751541/files/08336995.pdf) of Uthayanath Suthakar, Luca Magnoni, David Ryan Smith and Akram Khan.
 
-Source code used in this project is forked from [https://github.com/apssouza22/lambda-arch](https://github.com/apssouza22/lambda-arch), a project of [apssouza22](https://github.com/apssouza22) that implements the old lambda architecture.
+Source code used in this project is forked (and modified) from [https://github.com/apssouza22/lambda-arch](https://github.com/apssouza22/lambda-arch), a project of [apssouza22](https://github.com/apssouza22) that implements the old lambda architecture.
 
 ## Architecture
 
