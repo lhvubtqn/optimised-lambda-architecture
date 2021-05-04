@@ -6,7 +6,7 @@ set -e
 
 # Main
 echo "--------------------------------------------------------------------------------"
-echo "---                                    HDFS                                  ---"
+echo "---                                  Storages                                ---"
 echo "--------------------------------------------------------------------------------"
 
 ./stop.sh
@@ -16,10 +16,23 @@ if [[ "$(docker network ls | grep lambda-network 2> /dev/null)" == "" ]]; then
   docker network create -d bridge lambda-network
 fi
 
-echo -e "\n🐳 Starting HDFS"
+echo -e "\n🐳 Starting Storages"
 docker-compose up -d --remove-orphans
 
-sleep 5
+CASSANDRA_CONTAINER=cassandra
+echo -e "\n⏳ Waiting for Cassandra to be up and running"
+while true
+do
+  if [ $(docker logs $CASSANDRA_CONTAINER 2>&1 | grep "Startup complete" >/dev/null; echo $?) -eq 0 ]; then
+    echo
+    break
+  fi
+  printf "."
+  sleep 1
+done
+
+echo -e "\n⏳ Creating Casandra schema..."
+docker exec -it $CASSANDRA_CONTAINER cqlsh --username cassandra --password cassandra  -f /schema.cql
 
 HDFS_CONTAINER=namenode
 echo -e "\n⏳ Creating folders on HDFS & change permission..."
