@@ -1,0 +1,19 @@
+version: "2"
+
+networks:
+  default:
+    external:
+      name: lambda-network
+
+services:
+  pyspark-notebook:
+    image: jupyter/pyspark-notebook:latest
+    container_name: pyspark-notebook
+    volumes:
+      - ./notebooks:/home/jovyan/work
+      - ./third-party-jars:/usr/local/spark/third-party-jars
+    ports:
+      - 8888:8888
+      - 4040:4040
+      - 4041:4041
+      - 4042:4042
