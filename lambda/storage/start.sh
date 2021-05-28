@@ -16,29 +16,34 @@ if [[ "$(docker network ls | grep lambda-network 2> /dev/null)" == "" ]]; then
   docker network create -d bridge lambda-network
 fi
 
+if [[ "$(docker volume ls | grep hdfs-namenode 2> /dev/null)" == "" ]]; then
+  echo -e "\n🏭 Creating volume hdfs-namenode\n"
+  docker volume create hdfs-namenode
+fi
+
+if [[ "$(docker volume ls | grep hdfs-datanode 2> /dev/null)" == "" ]]; then
+  echo -e "\n🏭 Creating volume hdfs-datanode\n"
+  docker volume create hdfs-datanode
+fi
+
+if [[ "$(docker volume ls | grep mongodb-data 2> /dev/null)" == "" ]]; then
+  echo -e "\n🏭 Creating volume mongodb-data\n"
+  docker volume create mongodb-data
+fi
+
 echo -e "\n🐳 Starting Storages"
 docker-compose up -d --remove-orphans
 
-CASSANDRA_CONTAINER=cassandra
-echo -e "\n⏳ Waiting for Cassandra to be up and running"
+HDFS_CONTAINER=namenode
+echo -e "\n⏳ Waiting for HDFS to be up and running"
 while true
 do
-  if [ $(docker logs $CASSANDRA_CONTAINER 2>&1 | grep "Startup complete" >/dev/null; echo $?) -eq 0 ]; then
+  if [ $(docker logs $HDFS_CONTAINER 2>&1 | grep "NameNode RPC up at" > /dev/null; echo $?) -eq 0 ]; then
     echo
     break
   fi
   printf "."
   sleep 1
 done
-
-echo -e "\n⏳ Creating Casandra schema..."
-docker exec -it $CASSANDRA_CONTAINER cqlsh --username cassandra --password cassandra  -f /schema.cql
-
-HDFS_CONTAINER=namenode
-echo -e "\n⏳ Creating folders on HDFS & change permission..."
-docker exec $HDFS_CONTAINER hdfs dfs -mkdir /lambda-arch
-docker exec $HDFS_CONTAINER hdfs dfs -mkdir /lambda-arch/checkpoint
-docker exec $HDFS_CONTAINER hdfs dfs -chmod -R 777 /lambda-arch
-docker exec $HDFS_CONTAINER hdfs dfs -chmod -R 777 /lambda-arch/checkpoint
 
 exit 0

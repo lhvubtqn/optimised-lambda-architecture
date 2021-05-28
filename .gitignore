@@ -7,3 +7,5 @@ dependency-reduced-pom.xml
 .idea
 
 .vscode
+
+/lambda/storage/data
