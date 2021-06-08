@@ -2,6 +2,6 @@
 
 cd "$(dirname "$0")"
 
-(cd spark && ./stop.sh)
-(cd storage && ./stop.sh)
+(cd pyspark-notebook && ./stop.sh)
 (cd kafka && ./stop.sh)
+(cd storage && ./stop.sh)
