@@ -12,6 +12,7 @@ services:
     volumes:
       - ./notebooks:/home/jovyan/work
       - ./third-party-jars:/usr/local/spark/third-party-jars
+      - ../storage/data:/home/data
     ports:
       - 8888:8888
       - 4040:4040
