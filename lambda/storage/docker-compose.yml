@@ -6,13 +6,15 @@ networks:
       name: lambda-network
 
 services:
-  mongodb:
-    image: docker.io/bitnami/mongodb:4.4
-    container_name: mongodb
+  timescaledb:
+    image: timescale/timescaledb:latest-pg12
+    container_name: timescaledb
     ports:
-      - 27017:27017
+      - 5432:5432
     volumes:
-      - mongodb-data:/bitnami/mongodb
+      - timescaledb-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: password
 
   namenode:
     image: bde2020/hadoop-namenode:1.1.0-hadoop2.8-java8
@@ -47,5 +49,5 @@ volumes:
     external: true
   hdfs-datanode:
     external: true
-  mongodb-data:
+  timescaledb-data:
     external: true

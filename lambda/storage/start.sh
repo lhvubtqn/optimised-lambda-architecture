@@ -26,9 +26,9 @@ if [[ "$(docker volume ls | grep hdfs-datanode 2> /dev/null)" == "" ]]; then
   docker volume create hdfs-datanode
 fi
 
-if [[ "$(docker volume ls | grep mongodb-data 2> /dev/null)" == "" ]]; then
-  echo -e "\n🏭 Creating volume mongodb-data\n"
-  docker volume create mongodb-data
+if [[ "$(docker volume ls | grep timescaledb-data 2> /dev/null)" == "" ]]; then
+  echo -e "\n🏭 Creating volume timescaledb-data\n"
+  docker volume create timescaledb-data
 fi
 
 echo -e "\n🐳 Starting Storages"
