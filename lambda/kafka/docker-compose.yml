@@ -62,3 +62,18 @@ services:
       CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_SKIP_BACKLOG_MINUTES: 0
       CONFLUENT_METRICS_TOPIC_REPLICATION: 1
       PORT: 9021
+
+  crawler:
+    image: node:14.15.1
+    container_name: crawler
+    depends_on:
+      - kafka
+      - control-center
+    volumes:
+      - ./crawler:/home
+    environment:
+      WAIT_TIME_MS_BEFORE_START: 5000
+      BOOTSTRAP_SERVERS: kafka:29092
+      TOPIC: buses-location
+      CRAWL_INTERVAL_MS: 15000
+    command: bash -c "cd /home && npm install && node index.js"

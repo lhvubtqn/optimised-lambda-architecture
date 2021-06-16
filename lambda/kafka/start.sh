@@ -33,6 +33,5 @@ done
 
 echo -e "\n⏳ Creating Kafka topics"
 docker exec -it $KAFKA_CONTAINER_NAME kafka-topics --zookeeper zookeeper:2181 --create --topic buses-location --partitions 8 --replication-factor 1 --config retention.bytes=102400
-docker exec -it $KAFKA_CONTAINER_NAME kafka-topics --zookeeper zookeeper:2181 --create --topic iot-data-event --partitions 8 --replication-factor 1 --config retention.bytes=102400
 
 exit 0
