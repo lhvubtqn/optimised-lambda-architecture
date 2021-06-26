@@ -8,4 +8,6 @@ dependency-reduced-pom.xml
 
 .vscode
 
+node_modules
+
 /lambda/storage/data
