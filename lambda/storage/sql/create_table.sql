@@ -9,8 +9,6 @@ CREATE TABLE IF NOT EXISTS bus_arrival (
    latitude DOUBLE PRECISION NOT NULL,
    longitude DOUBLE PRECISION NOT NULL,
    stop_id INT NOT NULL,
-   stop_lat DOUBLE PRECISION NOT NULL,
-   stop_lon DOUBLE PRECISION NOT NULL,
    seconds_till_meet BIGINT NOT NULL
 );
 
