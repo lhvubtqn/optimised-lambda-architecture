@@ -4,6 +4,8 @@ DROP TABLE IF EXISTS bus_arrival;
 
 CREATE TABLE IF NOT EXISTS bus_arrival (
    timestamp TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+   req_time TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+   inserted_time TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT current_timestamp,
    route_id INT NOT NULL,
    bus_id INT NOT NULL,
    latitude DOUBLE PRECISION NOT NULL,
@@ -20,6 +22,8 @@ DROP TABLE IF EXISTS bus_velocity;
 
 CREATE TABLE IF NOT EXISTS bus_velocity (
    timestamp TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+   req_time TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+   inserted_time TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT current_timestamp,
    route_id INT NOT NULL,
    bus_id INT NOT NULL,
    latitude DOUBLE PRECISION NOT NULL,
