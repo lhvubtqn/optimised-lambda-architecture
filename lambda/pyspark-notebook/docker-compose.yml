@@ -15,6 +15,10 @@ services:
       - ../storage/data:/home/data
     ports:
       - 8888:8888
+      - 8080:8080
       - 4040:4040
       - 4041:4041
       - 4042:4042
+    user: root
+    environment:
+      - GRANT_SUDO=yes
