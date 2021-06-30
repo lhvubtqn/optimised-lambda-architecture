@@ -23,7 +23,18 @@ The architecture includes:
 ### Flowchart
 
 Overall workflow of the system is described as follow:
-![flowchart](./images/flowchart.png)
+
+#### Preprocessing data
+
+![flowchart-preprocess](./images/flowchart-preprocess.png)
+
+#### Batch layer
+
+![flowchart-batch-layer](./images/flowchart-batch-layer.png)
+
+#### Stream layer
+
+![flowchart-stream-layer](./images/flowchart-stream-layer.png)
 
 ## Performance Testing
 
