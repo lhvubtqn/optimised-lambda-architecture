@@ -17,9 +17,6 @@ if [[ "$(docker volume ls | grep lambda-grafana-storage 2> /dev/null)" == "" ]];
   docker volume create lambda-grafana-storage
 fi
 
-echo -e "\n⏳ Create database for metabase storage..."
-docker exec timescaledb bash -c "echo 'CREATE DATABASE metabase;' | psql -U postgres -h localhost"
-
 echo -e "\n🐳 Starting Serving Layer"
 docker-compose up -d
 
