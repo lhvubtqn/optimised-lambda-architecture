@@ -16,7 +16,7 @@ services:
       - ./data:/home/data
       - ./sql:/home/sql
     environment:
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: 8zr7E3SV
 
   namenode:
     image: bde2020/hadoop-namenode:1.1.0-hadoop2.8-java8
