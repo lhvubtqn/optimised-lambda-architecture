@@ -11,3 +11,5 @@ dependency-reduced-pom.xml
 node_modules
 
 /lambda/storage/data
+
+volumes
