@@ -13,3 +13,5 @@ node_modules
 /lambda/storage/data
 
 volumes
+
+.ipynb_checkpoints
