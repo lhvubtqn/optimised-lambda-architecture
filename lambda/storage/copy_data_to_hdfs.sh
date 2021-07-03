@@ -12,7 +12,7 @@ echo "--------------------------------------------------------------------------
 HDFS_CONTAINER=namenode
 
 echo -e "\n⏳ Copying data folders to HDFS..."
-unzip data.zip
+unzip -q data.zip
 docker exec $HDFS_CONTAINER bash -c "hdfs dfs -copyFromLocal /home/data/static_data/* /ola/static_data"
 docker exec $HDFS_CONTAINER bash -c "hdfs dfs -copyFromLocal /home/data/aggregated_data/* /ola/aggregated_data"
 
