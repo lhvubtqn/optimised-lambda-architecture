@@ -18,6 +18,18 @@ services:
     environment:
       POSTGRES_PASSWORD: 8zr7E3SV
 
+  redis:
+    image: docker.io/bitnami/redis:6.2
+    container_name: redis
+    environment:
+      # - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+      - REDIS_PASSWORD=8zr7E3SV
+    ports:
+      - "6379:6379"
+    volumes:
+      - "redis-data:/bitnami/redis/data"
+
   namenode:
     image: bde2020/hadoop-namenode:1.1.0-hadoop2.8-java8
     container_name: namenode
@@ -52,4 +64,6 @@ volumes:
   hdfs-datanode:
     external: true
   timescaledb-data:
+    external: true
+  redis-data:
     external: true

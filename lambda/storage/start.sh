@@ -31,6 +31,11 @@ if [[ "$(docker volume ls | grep timescaledb-data 2> /dev/null)" == "" ]]; then
   docker volume create timescaledb-data
 fi
 
+if [[ "$(docker volume ls | grep redis-data 2> /dev/null)" == "" ]]; then
+  echo -e "\n🏭 Creating volume redis-data\n"
+  docker volume create redis-data
+fi
+
 echo -e "\n🐳 Starting Storages"
 docker-compose up -d --remove-orphans
 
