@@ -37,7 +37,7 @@ output_file=$(docker exec $CONTAINER_NAME bash -c "cd /usr/local/spark/sbin && .
 sleep 5
 
 config='
-SPARK_WORKER_INSTANCES=2
+SPARK_WORKER_INSTANCES=3
 SPARK_WORKER_CORES=1
 SPARK_WORKER_MEMORY=2g
 '
