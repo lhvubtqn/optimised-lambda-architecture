@@ -44,31 +44,30 @@ services:
     volumes:
       - .:/home/data
 
-  control-center:
-    image: confluentinc/cp-enterprise-control-center:6.0.0
-    container_name: control-center
-    depends_on:
-      - kafka
-    ports:
-      - "9021:9021"
-    environment:
-      CONTROL_CENTER_BOOTSTRAP_SERVERS: "kafka:29092"
-      CONTROL_CENTER_CONNECT_MONGOSINK_CLUSTER: "kafka-connect-1:8083,kafka-connect-2:8083,kafka-connect-3:8083"
-      CONTROL_CENTER_CONNECT_DATAGEN_CLUSTER: "datagen:8083"
-      CONTROL_CENTER_REPLICATION_FACTOR: 1
-      CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: 1
-      CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
-      CONTROL_CENTER_MONITORING_INTERCEPTOR_BOOTSTRAP_SERVERS: "kafka:29092"
-      CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_SKIP_BACKLOG_MINUTES: 0
-      CONFLUENT_METRICS_TOPIC_REPLICATION: 1
-      PORT: 9021
+  # control-center:
+  #   image: confluentinc/cp-enterprise-control-center:6.0.0
+  #   container_name: control-center
+  #   depends_on:
+  #     - kafka
+  #   ports:
+  #     - "9021:9021"
+  #   environment:
+  #     CONTROL_CENTER_BOOTSTRAP_SERVERS: "kafka:29092"
+  #     CONTROL_CENTER_CONNECT_MONGOSINK_CLUSTER: "kafka-connect-1:8083,kafka-connect-2:8083,kafka-connect-3:8083"
+  #     CONTROL_CENTER_CONNECT_DATAGEN_CLUSTER: "datagen:8083"
+  #     CONTROL_CENTER_REPLICATION_FACTOR: 1
+  #     CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: 1
+  #     CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
+  #     CONTROL_CENTER_MONITORING_INTERCEPTOR_BOOTSTRAP_SERVERS: "kafka:29092"
+  #     CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_SKIP_BACKLOG_MINUTES: 0
+  #     CONFLUENT_METRICS_TOPIC_REPLICATION: 1
+  #     PORT: 9021
 
   crawler:
     image: node:14.15.1
     container_name: crawler
     depends_on:
       - kafka
-      - control-center
     volumes:
       - ./crawler:/home
     environment:
