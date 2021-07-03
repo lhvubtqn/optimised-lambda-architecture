@@ -39,9 +39,9 @@ sleep 5
 config='
 SPARK_WORKER_INSTANCES=3
 SPARK_WORKER_CORES=1
-SPARK_WORKER_MEMORY=1g
+SPARK_WORKER_MEMORY=2g
 '
-echo -e "\n⏳ Starting 2 workers with 1 cores & 2g memory each..."
+echo -e "\n⏳ Starting 3 workers with 1 cores & 2g memory each..."
 spark_master_address=$(docker exec $CONTAINER_NAME cat $output_file | grep -oP "Starting Spark master at \K.*")
 docker exec $CONTAINER_NAME bash -c "echo '$config' > /usr/local/spark/conf/spark-env.sh && /usr/local/spark/sbin/start-worker.sh $spark_master_address" > /dev/null
 
