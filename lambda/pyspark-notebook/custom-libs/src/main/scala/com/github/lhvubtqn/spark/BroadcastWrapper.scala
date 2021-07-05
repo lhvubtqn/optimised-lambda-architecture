@@ -22,6 +22,19 @@ import org.apache.spark.sql.types._
  * Date: 05/07/2021
  * Time: 00:43
  */
+object BroadcastWrapper {
+  val UPDATE_DELTA_MS = 60000
+
+  private val obj = new BroadcastWrapper
+
+  def getInstance: BroadcastWrapper = obj
+}
+
+/**
+ * Created by vulh4
+ * Date: 05/07/2021
+ * Time: 00:43
+ */
 class BroadcastWrapper extends Serializable {
 
   private val aliasRouteId = Map.apply(
@@ -104,12 +117,4 @@ class BroadcastWrapper extends Serializable {
       .collect()(0)(0)
       .asInstanceOf[Map[String, Row]]
   }
-}
-
-object BroadcastWrapper {
-  val UPDATE_DELTA_MS = 300000
-
-  private val obj = new BroadcastWrapper
-
-  def getInstance: BroadcastWrapper = obj
 }
