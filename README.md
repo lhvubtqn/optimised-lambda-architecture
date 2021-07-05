@@ -2,8 +2,6 @@
 
 Inspired by this awesome [paper](https://cds.cern.ch/record/2751541/files/08336995.pdf) of Uthayanath Suthakar, Luca Magnoni, David Ryan Smith and Akram Khan.
 
-Source code used in this project is forked (and modified) from [https://github.com/apssouza22/lambda-arch](https://github.com/apssouza22/lambda-arch), a project of [apssouza22](https://github.com/apssouza22) that implements the old lambda architecture.
-
 ## Architecture
 
 The abstract architecture with used technologies is shown as below:
@@ -18,7 +16,7 @@ The architecture includes:
 
 - **Streaming Layer**: Apache Spark Streaming. Raw data from Kafka will be sent to this layer as a continuous stream and will be processed as minibatches. After process a minibatch, the layer will check if there are new data at the known folder in HDFS. If there are, the merging process will happen, that merges result data from Batch Layer, Streaming Layer and update the Serving Layer. This will ensure that the data in Serving Layer is eventually consistent.
 
-- **Serving Layer**: MongoDB. Result data are stored in this layer. The dashboard application will get data from this database to visualize statistics. Admin can use MongoDB Client like Atlas or Robo3t to query stats from MongoDB directly.
+- **Serving Layer**: Result data are stored in this layer. The dashboard application will get data from **TimescaleDB** or **Redis** to visualize statistics. Admin can use JDBC Client (like DBeaver), Redis Client (like redis-cli) to query stats from databases directly.
 
 ### Flowchart
 
