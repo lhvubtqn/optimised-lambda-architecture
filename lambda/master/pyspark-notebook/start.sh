@@ -34,6 +34,10 @@ done
 
 echo -e "\n⏳ Starting Spark Master..."
 output_file=$(docker exec $CONTAINER_NAME bash -c "cd /usr/local/spark/sbin && ./start-master.sh -h master | grep -oP 'logging to \K.*'")
+sleep 5
+
+spark_master_address=$(docker exec $CONTAINER_NAME cat $output_file | grep -oP "Starting Spark master at \K.*")
+echo -e "\nMaster address: $spark_master_address"
 
 echo -e "\n🏭 Pyspark Notebook: $(docker logs $CONTAINER_NAME 2>&1 | grep -oP '\K(http://127.0.0.1:8888.*)' | head -n 1)"
 
