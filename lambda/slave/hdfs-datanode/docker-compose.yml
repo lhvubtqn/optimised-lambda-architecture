@@ -1,0 +1,24 @@
+version: "2"
+
+networks:
+  default:
+    external:
+      name: lambda-network
+
+services:
+  datanode:
+    image: bde2020/hadoop-datanode:1.1.0-hadoop2.8-java8
+    container_name: datanode
+    hostname: datanode
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://master:8020
+    ports:
+      - 50075:50075
+      - 50010:50010
+    volumes:
+      - hdfs-datanode:/hadoop/dfs/data
+      - ./data:/home/data
+
+volumes:
+  hdfs-datanode:
+    external: true

@@ -10,7 +10,9 @@ dependency-reduced-pom.xml
 
 node_modules
 
-/lambda/storage/data
+/lambda/master/storage/data
+
+/lambda/master/kafka/kafka_2.12-2.6.0
 
 volumes
 
