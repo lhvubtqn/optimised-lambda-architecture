@@ -7,7 +7,7 @@ networks:
 
 services:
   pyspark-notebook:
-    image: jupyter/pyspark-notebook:latest
+    image: lhvubtqn.azurecr.io/pyspark-notebook-with-third-party-jars:3.1.2-bin-hadoop3.2
     container_name: pyspark-notebook
     volumes:
       - ./notebooks:/home/jovyan/work

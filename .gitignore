@@ -12,6 +12,8 @@ node_modules
 
 /lambda/storage/data
 
+/lambda/k8s/hdfs/data
+
 volumes
 
 .ipynb_checkpoints

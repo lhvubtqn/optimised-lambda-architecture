@@ -1,0 +1,93 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pyspark-notebook-data-disk
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: default
+  resources:
+    requests:
+      storage: 100Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pyspark-notebook
+spec:
+  ports:
+    - name: "8888"
+      port: 8888
+    - name: "4040"
+      port: 4040
+    - name: "4041"
+      port: 4041
+    - name: "4042"
+      port: 4042
+  selector:
+    app: pyspark-notebook
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pyspark-driver
+spec:
+  ports:
+    - protocol: TCP
+      port: 21212
+  selector:
+    app: pyspark-notebook
+  clusterIP: None
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pyspark-notebook-ingress
+  annotations:
+    kubernetes.io/ingress.class: addon-http-application-routing
+    nginx.ingress.kubernetes.io/proxy-body-size: 8m
+spec:
+  rules:
+  - host: notebook.f7f408665cdc431daa59.westus2.aksapp.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service: 
+            name: pyspark-notebook
+            port: 
+              number: 8888
+
+  - host: stream.f7f408665cdc431daa59.westus2.aksapp.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service: 
+            name: pyspark-notebook
+            port: 
+              number: 4040
+
+  - host: batch.f7f408665cdc431daa59.westus2.aksapp.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service: 
+            name: pyspark-notebook
+            port: 
+              number: 4041
+
+  - host: preprocess.f7f408665cdc431daa59.westus2.aksapp.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service: 
+            name: pyspark-notebook
+            port: 
+              number: 4042

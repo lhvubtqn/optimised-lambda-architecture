@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pyspark-notebook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pyspark-notebook
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: pyspark-notebook
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+        - image: lhvubtqn.azurecr.io/pyspark-notebook-with-third-party-jars:3.1.2-bin-hadoop3.2
+          imagePullPolicy: Always
+          name: pyspark-notebook
+          ports:
+            - containerPort: 8888
+            - containerPort: 4040
+            - containerPort: 4041
+            - containerPort: 4042
+            - containerPort: 21212
+          env:
+            - name: GRANT_SUDO
+              value: "yes"
+          volumeMounts:
+            - mountPath: "/home/jovyan"
+              name: pyspark-notebook-data-volume
+              subPath: workdir
+      restartPolicy: Always
+      volumes:
+        - name: pyspark-notebook-data-volume
+          persistentVolumeClaim:
+            claimName: pyspark-notebook-data-disk

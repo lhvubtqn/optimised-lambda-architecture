@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: lametro-crawler
+  name: crawler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lametro-crawler
+  template:
+    metadata:
+      labels:
+        app: lametro-crawler
+    spec:
+      containers:
+        - image: lhvubtqn.azurecr.io/lametro-crawler:v2
+          name: lametro-crawler
+          env:
+            - name: BOOTSTRAP_SERVERS
+              value: "kafka-service:29092"
+            - name: CRAWL_INTERVAL_MS
+              value: "15000"
+            - name: TOPIC
+              value: "buses-location"
+            - name: WAIT_TIME_MS_BEFORE_START
+              value: "5000"
+      restartPolicy: Always
