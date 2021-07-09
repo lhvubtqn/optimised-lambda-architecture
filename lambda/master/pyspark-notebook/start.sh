@@ -16,6 +16,32 @@ if [ ! -d ./spark-3.1.1-bin-hadoop3.2 ]; then
   rm spark-3.1.1-bin-hadoop3.2.tgz)
 fi
 
+if [ ! -d ./kafka_2.12-2.6.0 ]; then
+  echo -e "\n⏳ Downloading kafka_2.12-2.6.0"
+  (curl -O https://archive.apache.org/dist/kafka/2.6.0/kafka_2.12-2.6.0.tgz && \
+  tar -xzf kafka_2.12-2.6.0.tgz && \
+  rm kafka_2.12-2.6.0.tgz)
+fi
+
+if [ ! -d ./node-v14.17.3-linux-x64 ]; then
+  echo -e "\n⏳ Downloading node-v14.17.3-linux-x64"
+  (curl -O https://nodejs.org/dist/v14.17.3/node-v14.17.3-linux-x64.tar.xz && \
+  tar -xf node-v14.17.3-linux-x64.tar.xz && \
+  rm node-v14.17.3-linux-x64.tar.xz)
+fi
+
+if [ ! -d ./hadoop-3.2.2 ]; then
+  echo -e "\n⏳ Downloading hadoop-3.2.2"
+  (curl -O https://mirror.downloadvn.com/apache/hadoop/common/hadoop-3.2.2/hadoop-3.2.2.tar.gz && \
+  tar -xzf hadoop-3.2.2.tar.gz && \
+  rm hadoop-3.2.2.tar.gz)
+fi
+
+
+
+
+
+
 export SPARK_HOME=$(pwd)/spark-3.1.1-bin-hadoop3.2
 export PATH=$SPARK_HOME/bin:$PATH
 
