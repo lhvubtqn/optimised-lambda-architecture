@@ -1,6 +1,68 @@
-# An Implementation Of The Optimised Lambda Architecture
+# Hướng dẫn cụ thể triển khai hệ thống
 
-Inspired by this awesome [paper](https://cds.cern.ch/record/2751541/files/08336995.pdf) of Uthayanath Suthakar, Luca Magnoni, David Ryan Smith and Akram Khan.
+Hệ thống sử dụng trong luận văn được cài đặt trên ba máy chủ ảo của Microsoft Azure, trong đó một máy chịu trách nhiệm chạy các tác vụ điều khiển và cơ sở dữ liệu, hai máy còn lại chạy tiến trình Spark Executor và HDFS DataNode. Chi tiết các tác vụ được trình bày trong hình sau:
+
+![Deploy map](./images/deploy-map.png)
+
+## Triển khai các tác vụ
+
+### Thiết lập các thông số cần thiết
+
+Ở tệp tin [ssh/constants.cfg](./ssh/constants.cfg), điều chỉnh các thông số cho phù hợp với môi trường triển khai hệ thống. Trong đó:
+
+- `MASTER_ADDRESS`: Địa chỉ của máy master.
+- `WORKER_NUM`: Số lượng máy worker.
+- `WORKER_ADDRESS_<i>`: Địa chỉ máy worker thứ `i`.
+- `SSH_USERNAME`: Tên tài khoản dùng để truy cập các máy chủ.
+- `SSH_KEY_PATH`: Đường dẫn đến tập tin khoá bảo mật (private key) để truy cập đến các máy chủ. Trên các máy chủ cần có các tệp khóa công khai (public key) để xác nhận sự truy cập.
+
+Xem cách tạo khóa và truy cập máy chủ từ xa tại: [Hướng dẫn cách truy cập các máy chủ tử xa sử dụng ssh và khóa](https://www.digitalocean.com/community/tutorials/how-to-configure-ssh-key-based-authentication-on-a-linux-server).
+
+### Cài đặt các công cụ cần thiết
+
+#### Java
+Các máy chủ cần có Java với phiên bản từ `11.0.11` trở lên.
+
+- Copy thư mục chứa java lên các máy chủ:
+
+
+
+---
+
+**IMPORTANT** Biến môi trường `JAVA_HOME` cần được thiết lập để trỏ đến đúng thư mục cài đặt của Java.
+
+---
+
+#### Docker 
+Máy master sử dụng [Docker](https://www.docker.com/) để chạy các tác vụ cơ sở dữ liệu và Grafana.
+
+- Cài đặt `docker` cho Ubunbu: [Hướng dẫn cài đặt Docker Engine trên Ubuntu](https://docs.docker.com/engine/install/ubuntu/).
+- Thiết lập để việc sử dụng `docker` không cần phải có lệnh `sudo`: [Quản lý Docker như một người dùng không phải root](https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user).
+- Cài đặt `docker-compose`: [Hướng dẫn cài đặt Docker Compose](https://docs.docker.com/compose/install/).
+### Triển khai cụm Spark Standalone 
+
+Cụm Spark Standalone bao gồm một Spark Master chạy ở máy master, và một Spark Executor chạy ở mỗi máy worker.
+
+#### Spark Master
+- Copy tập tin cần thiết đến máy chủ:
+```sh
+./ssh/copy_to_master.sh ./scripts/start_spark_master.sh .
+```
+
+- Chạy Spark Master:
+```sh
+./ssh/run_master_command.sh 
+```
+
+#### Spark Worker
+- Copy tập tin cần thiết đến máy chủ:
+```sh
+```
+
+- Truy cập từng máy chủ và chạy lệnh:
+```sh
+```
+
 
 ## Architecture
 
