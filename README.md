@@ -61,6 +61,38 @@ Cụm Spark Standalone bao gồm một Spark Master chạy ở máy master, và 
 ./ssh/run_command_on_workers.sh start_spark_worker.sh
 ```
 
+### Triển khai Jupyter Notebook
+
+Luận văn sử dụng Jupyter Notebook để làm công cụ chỉnh sửa mã nguồn.
+
+- Cài đặt thư viện `jupyter`:
+```sh
+./ssh/run_command_on_master.sh "pip3 install jupyter"
+```
+
+- Cài đặt thư viện `findspark`:
+```sh
+./ssh/run_command_on_master.sh "pip3 install findspark"
+```
+
+- Chạy Jupyter Notebook:
+```sh
+./ssh/copy_to_master.sh scripts/start_jupyter_notebook.sh .
+./ssh/run_command_on_master.sh start_jupyter_notebook.sh
+```
+
+- Nếu máy master không có public IP, cần phải chạy lệnh:
+```sh
+./ssh/forward_master_port_to_local.sh 8888
+```
+
+- Nhấn vào đường dẫn hiện lên để truy cập Notebook. 
+
+---
+**NOTE** Đường dẫn để truy cập Notebook cần phải kèm theo token. Ví dụ: `http://localhost:8888?token=<token>`
+
+---
+
 ### Triển khai hệ thống quản lý tập tin phân tán HDFS
 HDFS gồm một tác vụ NameNode trên máy master và một tác vụ DataNode trên mỗi máy worker.
 
@@ -168,3 +200,36 @@ Truy cập [http://localhost:3000](http://localhost:3000), đăng nhập bằng 
 - Giao diện trang quản lý sẽ tương tự như sau:
 
 ![images/grafana-dashboard-3.png](images/grafana-dashboard-3.png)
+
+## Chạy mã nguồn
+
+### Các thiết lập cần thiết
+
+- Sao chép dữ liệu lên HDFS:
+```sh
+./ssh/copy_to_master.sh source/data.zip .
+./ssh/copy_to_master.sh scripts/copy_data_to_hdfs.sh .
+./ssh/run_command_on_master.sh copy_data_to_hdfs.sh
+```
+
+- Sao chép thư mục chứa mã nguồn lên master:
+```sh
+./ssh/copy_to_master.sh source/notebooks .
+```
+
+- Sao chép các thư viện cần thiết cho việc chạy mã nguồn lên master:
+```sh
+./ssh/copy_to_master.sh libs/third-party-jars libs/spark-3.1.1-bin-hadoop3.2/
+```
+
+- Truy cập Jupyter Notebook, sau đó mở tập tin `stream-job.ipynb`. Sau đó, ở thanh công cụ phía trên màn hình, chọn `Cell > Run All`.
+
+![images/notebook-1.png](images/notebook-1.png)
+
+
+---
+**NOTE** Cần điều chỉnh hostname của các biến tĩnh trong tập tin cho phù hợp với môi trường thực thi trước khi chạy.
+
+![images/notebook-2.png](images/notebook-2.png)
+
+---
