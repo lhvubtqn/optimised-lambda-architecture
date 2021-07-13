@@ -32,7 +32,11 @@ Các máy chủ cần có Java với phiên bản từ `11.0.11` trở lên.
 
 ```sh
 ./ssh/copy_to_all.sh libs/jdk-11.0.11_linux-x64_bin.tar.gz libs/
-./ssh/run_command_on_all.sh "cd libs && tar -xf jdk-11.0.11_linux-x64_bin.tar.gz && rm jdk-11.0.11_linux-x64_bin.tar.gz"
+./ssh/run_command_on_all.sh "
+    cd libs && \
+    tar -xf jdk-11.0.11_linux-x64_bin.tar.gz && \
+    rm jdk-11.0.11_linux-x64_bin.tar.gz
+"
 ```
 
 #### Python 3 và pip3
@@ -182,29 +186,23 @@ Truy cập [http://localhost:3000](http://localhost:3000), đăng nhập bằng 
 ##### Tạo nguồn dữ liệu
 
 - Ở thanh công cụ bên trái màn hình, chọn biểu tượng bánh răng, sau đó chọn `Data sources`.
-
 ![images/grafana-datasource-1.png](images/grafana-datasource-1.png)
 
-- Chọn `Add data source`.
-
+- Chọn `Add data source`.<br>
 ![images/grafana-datasource-2.png](images/grafana-datasource-2.png)
 
 - Điền thông tin như hình với mục `password` là `8zr7E3SV` (được thiết lập trong [docker/databases/docker-compose.yml](docker/databases/docker-compose.yml)), sau đó chọn `Save & Test`.
-
 ![images/grafana-datasource-3.png](images/grafana-datasource-3.png)
 
 ##### Tạo trang quản lý:
 
 - Ở thanh công cụ bên trái màn hình, chọn biểu tượng dấu cộng, sau đó chọn `Import`.
-
 ![images/grafana-dashboard-1.png](images/grafana-dashboard-1.png)
 
 - Chọn `Upload JSON file` và chọn tập tin [docker/grafana/dashboard.json](docker/grafana/dashboard.json). Nhấn `Import` để tạo trang quản lý.
-
 ![images/grafana-dashboard-2.png](images/grafana-dashboard-2.png)
 
 - Giao diện trang quản lý sẽ tương tự như sau:
-
 ![images/grafana-dashboard-3.png](images/grafana-dashboard-3.png)
 
 ## Chạy mã nguồn
@@ -229,10 +227,7 @@ Truy cập [http://localhost:3000](http://localhost:3000), đăng nhập bằng 
 ```
 
 - Truy cập Jupyter Notebook, sau đó mở tập tin `stream-job.ipynb`. Sau đó, ở thanh công cụ phía trên màn hình, chọn `Cell > Run All`.
-
 ![images/notebook-1.png](images/notebook-1.png)
-
-
 ---
 **NOTE** Cần điều chỉnh hostname của các biến tĩnh trong tập tin cho phù hợp với môi trường thực thi trước khi chạy.
 
