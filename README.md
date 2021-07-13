@@ -127,6 +127,12 @@ ssh-keygen -b 4096 -t rsa -f ssh/id_rsa -q -N ""
 ./ssh/run_command_on_master.sh start_hdfs.sh
 ```
 
+- Dùng port-forwarding để điều hướng các yêu cầu đến master:
+```sh
+./ssh/forward_master_port_to_local.sh 9870
+```
+Sau đó truy cập [http://locahost:9870](http://locahost:9870) để vào trang quản lý của HDFS.
+
 ### Triển khai Apache Kafka
 Hệ thống sử dụng Apache Kafka như một trung gian truyền dữ liệu.
 
