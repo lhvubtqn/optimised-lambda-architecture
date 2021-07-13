@@ -6,9 +6,9 @@ cd "$(dirname "$0")"
 
 # Require environment: MASTER_INTERNAL_ADDRESS=<internal master address>
 # This address should be accessible from workers
-if [ "$MASTER_INTERNAL_ADDRESS" = "" ]; then
-    MASTER_INTERNAL_ADDRESS=$(hostname -i)
-fi
+# if [ "$MASTER_INTERNAL_ADDRESS" = "" ]; then
+#     MASTER_INTERNAL_ADDRESS=
+# fi
 
 # Download Apache Spark
 if [ ! -d ./libs/spark-3.1.1-bin-hadoop3.2 ]; then
@@ -25,6 +25,6 @@ export SPARK_HOME=$(pwd)/libs/spark-3.1.1-bin-hadoop3.2
 export PATH=$SPARK_HOME/bin:$PATH
 
 # Start Spark Master
-SPARK_MASTER_HOST=$MASTER_INTERNAL_ADDRESS $SPARK_HOME/sbin/start-master.sh
+SPARK_WORKER_MEMORY=3g SPARK_WORKER_PORT=7070 $SPARK_HOME/sbin/start-worker.sh spark://$MASTER_INTERNAL_ADDRESS:7077
 
 exit 0
