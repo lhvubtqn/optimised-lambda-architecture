@@ -1,0 +1,562 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": 1,
+  "links": [],
+  "panels": [
+    {
+      "circleMaxSize": "1",
+      "circleMinSize": "1",
+      "colors": ["#73BF69", "#FADE2A", "#F2495C"],
+      "datasource": null,
+      "decimals": 0,
+      "esMetric": "Count",
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "hideEmpty": false,
+      "hideZero": false,
+      "id": 2,
+      "initialZoom": "10",
+      "locationData": "table",
+      "mapCenter": "custom",
+      "mapCenterLatitude": "34",
+      "mapCenterLongitude": "-118.3",
+      "maxDataPoints": 1,
+      "mouseWheelZoom": true,
+      "showLegend": true,
+      "stickyLabels": true,
+      "tableQueryOptions": {
+        "geohashField": "geohash",
+        "labelField": "bus_id",
+        "latitudeField": "latitude",
+        "longitudeField": "longitude",
+        "metricField": "velocity",
+        "queryType": "coordinates"
+      },
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT DISTINCT ON (bus_id)\n  \"timestamp\" AS \"time\",\n  bus_id AS \"bus_id\",\n  latitude AS \"latitude\",\n  longitude AS \"longitude\",\n  velocity * 3.6 AS \"velocity\"\nFROM bus_arrival\nWHERE\n  $__timeFilter(\"timestamp\")\nGROUP BY \"timestamp\", bus_id, latitude, longitude, velocity\nORDER BY bus_id, \"time\" DESC",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": ["latitude"],
+                "type": "column"
+              },
+              {
+                "params": ["latitude"],
+                "type": "alias"
+              }
+            ],
+            [
+              {
+                "params": ["longitude"],
+                "type": "column"
+              },
+              {
+                "params": ["longitude"],
+                "type": "alias"
+              }
+            ],
+            [
+              {
+                "params": ["velocity"],
+                "type": "column"
+              },
+              {
+                "params": ["velocity"],
+                "type": "alias"
+              }
+            ]
+          ],
+          "table": "bus_arrival",
+          "timeColumn": "\"timestamp\"",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "thresholds": "30,50",
+      "title": "current bus location (with velocity km/h)",
+      "type": "grafana-worldmap-panel",
+      "unitPlural": "km/h",
+      "unitSingle": "",
+      "unitSingular": "km/h",
+      "valueName": "current"
+    },
+    {
+      "datasource": null,
+      "description": "latency due to system processing",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 20000
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 9
+      },
+      "id": 8,
+      "options": {
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "text": {}
+      },
+      "pluginVersion": "8.0.5",
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT percentile_cont(0.5) WITHIN GROUP (ORDER BY EXTRACT(MILLISECONDS FROM (\"inserted_time\" - \"req_time\"))) AS p50\nFROM bus_arrival\nWHERE $__timeFilter(\"timestamp\")",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": ["latitude"],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "bus_arrival",
+          "timeColumn": "\"timestamp\"",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        },
+        {
+          "format": "table",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT percentile_cont(0.90) WITHIN GROUP (ORDER BY EXTRACT(MILLISECONDS FROM (\"inserted_time\" - \"req_time\"))) AS p90\nFROM bus_arrival\nWHERE $__timeFilter(\"timestamp\")",
+          "refId": "B",
+          "select": [
+            [
+              {
+                "params": ["latitude"],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "bus_arrival",
+          "timeColumn": "\"timestamp\"",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        },
+        {
+          "format": "table",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT percentile_cont(0.99) WITHIN GROUP (ORDER BY EXTRACT(MILLISECONDS FROM (\"inserted_time\" - \"req_time\"))) AS p99\nFROM bus_arrival\nWHERE $__timeFilter(\"timestamp\")",
+          "refId": "C",
+          "select": [
+            [
+              {
+                "params": ["latitude"],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "bus_arrival",
+          "timeColumn": "\"timestamp\"",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "system latency",
+      "type": "gauge"
+    },
+    {
+      "datasource": null,
+      "description": "system latency plus network latency, bottle neck, ...",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 30000
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 9
+      },
+      "id": 10,
+      "options": {
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "text": {}
+      },
+      "pluginVersion": "8.0.5",
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT percentile_cont(0.50) WITHIN GROUP (ORDER BY EXTRACT(MILLISECONDS FROM (\"inserted_time\" - \"timestamp\"))) AS p50\nFROM bus_arrival\nWHERE $__timeFilter(\"timestamp\")",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": ["latitude"],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "bus_arrival",
+          "timeColumn": "\"timestamp\"",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        },
+        {
+          "format": "table",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT percentile_cont(0.90) WITHIN GROUP (ORDER BY EXTRACT(MILLISECONDS FROM (\"inserted_time\" - \"timestamp\"))) AS p90\nFROM bus_arrival\nWHERE $__timeFilter(\"timestamp\")",
+          "refId": "B",
+          "select": [
+            [
+              {
+                "params": ["latitude"],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "bus_arrival",
+          "timeColumn": "\"timestamp\"",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        },
+        {
+          "format": "table",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT percentile_cont(0.99) WITHIN GROUP (ORDER BY EXTRACT(MILLISECONDS FROM (\"inserted_time\" - \"timestamp\"))) AS p99\nFROM bus_arrival\nWHERE $__timeFilter(\"timestamp\")",
+          "refId": "C",
+          "select": [
+            [
+              {
+                "params": ["latitude"],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "bus_arrival",
+          "timeColumn": "\"timestamp\"",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "overall latency",
+      "type": "gauge"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "left",
+            "displayMode": "auto",
+            "filterable": true
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 17
+      },
+      "id": 4,
+      "options": {
+        "showHeader": true
+      },
+      "pluginVersion": "8.0.5",
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT DISTINCT ON (route_id, direction)\nroute_id, direction, velocity\nFROM bus_arrival\nWHERE $__timeFilter(\"timestamp\")\nGROUP BY route_id, direction, velocity, \"timestamp\"\nORDER BY route_id, direction, \"timestamp\" DESC",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": ["latitude"],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "bus_arrival",
+          "timeColumn": "\"timestamp\"",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "route velocity (km/h)",
+      "type": "table"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "left",
+            "displayMode": "auto",
+            "filterable": true
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 17
+      },
+      "id": 6,
+      "maxDataPoints": 1,
+      "options": {
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "8.0.5",
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT *\nFROM (\n  SELECT\n    bus_id AS \"bus_id\",\n    stop_id AS \"stop_id\",\n    max((\"timestamp\" + make_interval(secs => seconds_till_meet))) AS \"arrival_time\"\n  FROM bus_arrival\n  WHERE $__timeFilter(\"timestamp\")\n  GROUP BY bus_id, stop_id\n) AS temp\nORDER BY bus_id, arrival_time",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": ["latitude"],
+                "type": "column"
+              },
+              {
+                "params": ["latitude"],
+                "type": "alias"
+              }
+            ],
+            [
+              {
+                "params": ["longitude"],
+                "type": "column"
+              },
+              {
+                "params": ["longitude"],
+                "type": "alias"
+              }
+            ],
+            [
+              {
+                "params": ["velocity"],
+                "type": "column"
+              },
+              {
+                "params": ["velocity"],
+                "type": "alias"
+              }
+            ]
+          ],
+          "table": "bus_arrival",
+          "timeColumn": "\"timestamp\"",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "arrival time prediction",
+      "type": "table"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 30,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-5m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Lametro Bus",
+  "uid": "QpxDtHi7k",
+  "version": 4
+}

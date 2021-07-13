@@ -22,7 +22,7 @@ Xem thêm cách tạo khóa và truy cập máy chủ từ xa tại: [Hướng d
 
 Cuối cùng, copy tập tin [ssh/constants.cfg](./ssh/constants.cfg) lên các máy chủ:
 ```sh
-./ssh/copy_to_all.sh ./ssh/constants.cfg .
+./ssh/copy_to_all.sh ssh/constants.cfg .
 ```
 
 ### Cài đặt các công cụ cần thiết
@@ -31,9 +31,12 @@ Cuối cùng, copy tập tin [ssh/constants.cfg](./ssh/constants.cfg) lên các 
 Các máy chủ cần có Java với phiên bản từ `11.0.11` trở lên.
 
 ```sh
-./ssh/copy_to_all.sh ./libs/jdk-11.0.11_linux-x64_bin.tar.gz libs/
+./ssh/copy_to_all.sh libs/jdk-11.0.11_linux-x64_bin.tar.gz libs/
 ./ssh/run_command_on_all.sh "cd libs && tar -xf jdk-11.0.11_linux-x64_bin.tar.gz && rm jdk-11.0.11_linux-x64_bin.tar.gz"
 ```
+
+#### Python 3 và pip3
+Máy chủ master cần có Python 3 với phiên bản từ `3.6.9` trở lên. Chi tiết cài đặt có thể xem ở đầy: [Hướng dẫn cài đặt Python 3 và pip3 trên Ubuntu Linux](https://vinasupport.com/huong-dan-cai-dat-python-3-va-pip-3-tren-ubuntu-linux/)
 
 #### Docker 
 Máy master sử dụng [Docker](https://www.docker.com/) để chạy các tác vụ cơ sở dữ liệu và Grafana.
@@ -41,19 +44,20 @@ Máy master sử dụng [Docker](https://www.docker.com/) để chạy các tác
 - Cài đặt `docker` cho Ubunbu: [Hướng dẫn cài đặt Docker Engine trên Ubuntu](https://docs.docker.com/engine/install/ubuntu/).
 - Thiết lập để việc sử dụng `docker` không cần phải có lệnh `sudo`: [Quản lý Docker như một người dùng không phải root](https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user).
 - Cài đặt `docker-compose`: [Hướng dẫn cài đặt Docker Compose](https://docs.docker.com/compose/install/).
+
 ### Triển khai cụm Spark Standalone 
 
 Cụm Spark Standalone bao gồm một Spark Master chạy ở máy master, và một Spark Executor chạy ở mỗi máy worker.
 
 - Chạy Spark Master:
 ```sh
-./ssh/copy_to_master.sh ./scripts/start_spark_master.sh .
+./ssh/copy_to_master.sh scripts/start_spark_master.sh .
 ./ssh/run_command_on_master.sh start_spark_master.sh
 ```
 
 - Chạy các Spark Worker:
 ```sh
-./ssh/copy_to_workers.sh ./scripts/start_spark_worker.sh .
+./ssh/copy_to_workers.sh scripts/start_spark_worker.sh .
 ./ssh/run_command_on_workers.sh start_spark_worker.sh
 ```
 
@@ -87,43 +91,80 @@ ssh-keygen -b 4096 -t rsa -f ssh/id_rsa -q -N ""
 
 - Chạy HDFS:
 ```
-./ssh/copy_to_master.sh ./scripts/start_hdfs.sh .
+./ssh/copy_to_master.sh scripts/start_hdfs.sh .
 ./ssh/run_command_on_master.sh start_hdfs.sh
 ```
-## Architecture
 
-The abstract architecture with used technologies is shown as below:
-![Architecture](./images/architecture-horizontal.png)
-The architecture includes:
+### Triển khai Apache Kafka
+Hệ thống sử dụng Apache Kafka như một trung gian truyền dữ liệu.
 
-- **Kafka**: The message broker, where services or devices data are sent to. Those data will then be pushed to **HDFS** for later batch processing, sent to **Streaming Layer** for immediate processing and result.
+```sh
+./ssh/copy_to_master.sh scripts/start_kafka.sh .
+./ssh/run_command_on_master.sh start_kafka.sh
+```
 
-- **HDFS**: Distributed, fault tolerant file system. Kafka raw messages (raw data) & batch processing result are sent to here. This technology is chosen because it fits perfectly with Apache Spark.
+#### Chạy crawler
+Hệ thống sử dụng NodeJS để viết một chương trình liên tục nhận dữ liệu từ trang [http://api.metro.net/agencies/lametro/vehicles/](http://api.metro.net/agencies/lametro/vehicles/), sau đó gửi vào trong Kafka.
 
-- **Batch Layer**: Apache Spark SQL. This layer is scheduled to load all raw data from HDFS, dedupes and processes them periodically. The result will be sent to a known folder on HDFS and will replace all the old data in that folder. These data will then be used to correct the result produced by **Streaming Layer**.
+```sh
+./ssh/copy_to_master.sh source/crawler .
+./ssh/copy_to_master.sh scripts/start_crawler.sh .
+./ssh/run_command_on_master.sh start_crawler.sh
+```
 
-- **Streaming Layer**: Apache Spark Streaming. Raw data from Kafka will be sent to this layer as a continuous stream and will be processed as minibatches. After process a minibatch, the layer will check if there are new data at the known folder in HDFS. If there are, the merging process will happen, that merges result data from Batch Layer, Streaming Layer and update the Serving Layer. This will ensure that the data in Serving Layer is eventually consistent.
+### Cơ sở dữ liệu
+Hệ thống sử dụng TimescaleDB và Redis chạy trên nền Docker để làm cơ sở dữ liệu phục vụ truy vấn.
 
-- **Serving Layer**: Result data are stored in this layer. The dashboard application will get data from **TimescaleDB** or **Redis** to visualize statistics. Admin can use JDBC Client (like DBeaver), Redis Client (like redis-cli) to query stats from databases directly.
+```sh
+./ssh/copy_to_master.sh docker/databases .
+./ssh/run_command_on_master.sh databases/start.sh
+```
 
-### Flowchart
+### Grafana
+Hệ thống sử dụng Grafana để theo dõi trạng thái hoạt động của hệ thống, độ trễ, ...
 
-Overall workflow of the system is described as follow:
+#### Triển khai Grafana
 
-#### Preprocessing data
+- Chạy Grafana
+```sh
+./ssh/copy_to_master.sh docker/grafana .
+./ssh/run_command_on_master.sh grafana/start.sh
+```
 
-![flowchart-preprocess](./images/flowchart-preprocess.png)
+- Sử dụng port-forwarding để chuyển hướng các yêu cầu đến port 3000 ở máy local đến máy master.
+```sh
+./ssh/forward_master_port_to_local.sh 3000
+```
+Giữ cửa sổ lệnh này mở để truy cập vào Grafana ở local.
 
-#### Batch layer
+#### Thiết lập Grafana
 
-![flowchart-batch-layer](./images/flowchart-batch-layer.png)
+Truy cập [http://localhost:3000](http://localhost:3000), đăng nhập bằng tên tài khoản và mật khẩu `admin`.
 
-#### Stream layer
+##### Tạo nguồn dữ liệu
 
-![flowchart-stream-layer](./images/flowchart-stream-layer.png)
+- Ở thanh công cụ bên trái màn hình, chọn biểu tượng bánh răng, sau đó chọn `Data sources`.
 
-## Performance Testing
+![images/grafana-datasource-1.png](images/grafana-datasource-1.png)
 
-### Test environment
+- Chọn `Add data source`.
 
-### Test result
+![images/grafana-datasource-2.png](images/grafana-datasource-2.png)
+
+- Điền thông tin như hình với mục `password` là `8zr7E3SV` (được thiết lập trong [docker/databases/docker-compose.yml](docker/databases/docker-compose.yml)), sau đó chọn `Save & Test`.
+
+![images/grafana-datasource-3.png](images/grafana-datasource-3.png)
+
+##### Tạo trang quản lý:
+
+- Ở thanh công cụ bên trái màn hình, chọn biểu tượng dấu cộng, sau đó chọn `Import`.
+
+![images/grafana-dashboard-1.png](images/grafana-dashboard-1.png)
+
+- Chọn `Upload JSON file` và chọn tập tin [docker/grafana/dashboard.json](docker/grafana/dashboard.json). Nhấn `Import` để tạo trang quản lý.
+
+![images/grafana-dashboard-2.png](images/grafana-dashboard-2.png)
+
+- Giao diện trang quản lý sẽ tương tự như sau:
+
+![images/grafana-dashboard-3.png](images/grafana-dashboard-3.png)
