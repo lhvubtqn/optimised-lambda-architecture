@@ -135,7 +135,7 @@ ssh-keygen -b 4096 -t rsa -f ssh/id_rsa -q -N ""
 ```sh
 ./ssh/forward_master_port_to_local.sh 9870
 ```
-Sau đó truy cập [http://locahost:9870](http://locahost:9870) để vào trang quản lý của HDFS.
+Sau đó truy cập [http://localhost:9870](http://localhost:9870) để vào trang quản lý của HDFS.
 
 ### Triển khai Apache Kafka
 Hệ thống sử dụng Apache Kafka như một trung gian truyền dữ liệu.
@@ -199,7 +199,7 @@ Truy cập [http://localhost:3000](http://localhost:3000), đăng nhập bằng 
 - Ở thanh công cụ bên trái màn hình, chọn biểu tượng dấu cộng, sau đó chọn `Import`.
 ![images/grafana-dashboard-1.png](images/grafana-dashboard-1.png)
 
-- Chọn `Upload JSON file` và chọn tập tin [docker/grafana/dashboard.json](docker/grafana/dashboard.json). Nhấn `Import` để tạo trang quản lý.
+- Chọn `Upload JSON file` và chọn tập tin nằm ở [docker/grafana/dashboard.json](docker/grafana/dashboard.json). Nhấn `Import` để tạo trang quản lý.
 ![images/grafana-dashboard-2.png](images/grafana-dashboard-2.png)
 
 - Giao diện trang quản lý sẽ tương tự như sau:
