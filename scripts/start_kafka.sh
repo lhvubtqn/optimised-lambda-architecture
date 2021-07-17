@@ -20,13 +20,13 @@ export PATH=$KAFKA_HOME/bin:$PATH
 
 cd $KAFKA_HOME
 
-mkdir logs
+mkdir -p logs
 
 echo -e "\n🏭 Starting Zookeeper..."
-nohup bin/zookeeper-server-start.sh config/zookeeper.properties > logs/zookeeper.logs &
+nohup bin/zookeeper-server-start.sh config/zookeeper.properties > logs/zookeeper.logs 2> logs/zookeeper.logs &
 
 echo -e "\n🏭 Starting Kafka..."
-nohup bin/kafka-server-start.sh config/server.properties > logs/kafka.logs &
+nohup bin/kafka-server-start.sh config/server.properties > logs/kafka.logs 2> logs/kafka.logs&
 
 echo -e "\n⏳ Waiting for Kafka Broker to be up and running"
 while true

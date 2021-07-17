@@ -56,33 +56,28 @@ Cụm Spark Standalone bao gồm một Spark Master chạy ở máy master, và 
 - Chạy Spark Master:
 ```sh
 ./ssh/copy_to_master.sh scripts/start_spark_master.sh .
-./ssh/run_command_on_master.sh start_spark_master.sh
+./ssh/run_command_on_master.sh ./start_spark_master.sh
 ```
 
 - Chạy các Spark Worker:
 ```sh
 ./ssh/copy_to_workers.sh scripts/start_spark_worker.sh .
-./ssh/run_command_on_workers.sh start_spark_worker.sh
+./ssh/run_command_on_workers.sh ./start_spark_worker.sh
 ```
 
 ### Triển khai Jupyter Notebook
 
 Luận văn sử dụng Jupyter Notebook để làm công cụ chỉnh sửa mã nguồn.
 
-- Cài đặt thư viện `jupyter`:
+- Cài đặt các thư viện cần thiết:
 ```sh
 ./ssh/run_command_on_master.sh "pip3 install jupyter"
-```
-
-- Cài đặt thư viện `findspark`:
-```sh
-./ssh/run_command_on_master.sh "pip3 install findspark"
 ```
 
 - Chạy Jupyter Notebook:
 ```sh
 ./ssh/copy_to_master.sh scripts/start_jupyter_notebook.sh .
-./ssh/run_command_on_master.sh start_jupyter_notebook.sh
+./ssh/run_command_on_master.sh ./start_jupyter_notebook.sh
 ```
 
 - Nếu máy master không có public IP, cần phải chạy lệnh:
@@ -122,13 +117,13 @@ ssh-keygen -b 4096 -t rsa -f ssh/id_rsa -q -N ""
 - Config các máy chủ:
 ```
 ./ssh/copy_to_all.sh scripts/config_hdfs.sh .
-./ssh/run_command_on_all.sh config_hdfs.sh
+./ssh/run_command_on_all.sh ./config_hdfs.sh
 ```
 
 - Chạy HDFS:
 ```
 ./ssh/copy_to_master.sh scripts/start_hdfs.sh .
-./ssh/run_command_on_master.sh start_hdfs.sh
+./ssh/run_command_on_master.sh ./start_hdfs.sh
 ```
 
 - Dùng port-forwarding để điều hướng các yêu cầu đến master:
@@ -142,7 +137,7 @@ Hệ thống sử dụng Apache Kafka như một trung gian truyền dữ liệu
 
 ```sh
 ./ssh/copy_to_master.sh scripts/start_kafka.sh .
-./ssh/run_command_on_master.sh start_kafka.sh
+./ssh/run_command_on_master.sh ./start_kafka.sh
 ```
 
 #### Chạy crawler
@@ -151,7 +146,7 @@ Hệ thống sử dụng NodeJS để viết một chương trình liên tục n
 ```sh
 ./ssh/copy_to_master.sh source/crawler .
 ./ssh/copy_to_master.sh scripts/start_crawler.sh .
-./ssh/run_command_on_master.sh start_crawler.sh
+./ssh/run_command_on_master.sh ./start_crawler.sh
 ```
 
 ### Cơ sở dữ liệu
@@ -159,7 +154,7 @@ Hệ thống sử dụng TimescaleDB và Redis chạy trên nền Docker để l
 
 ```sh
 ./ssh/copy_to_master.sh docker/databases .
-./ssh/run_command_on_master.sh databases/start.sh
+./ssh/run_command_on_master.sh ./databases/start.sh
 ```
 
 ### Grafana
@@ -170,7 +165,7 @@ Hệ thống sử dụng Grafana để theo dõi trạng thái hoạt động c�
 - Chạy Grafana
 ```sh
 ./ssh/copy_to_master.sh docker/grafana .
-./ssh/run_command_on_master.sh grafana/start.sh
+./ssh/run_command_on_master.sh ./grafana/start.sh
 ```
 
 - Sử dụng port-forwarding để chuyển hướng các yêu cầu đến port 3000 ở máy local đến máy master.
@@ -213,7 +208,7 @@ Truy cập [http://localhost:3000](http://localhost:3000), đăng nhập bằng 
 ```sh
 ./ssh/copy_to_master.sh source/data.zip .
 ./ssh/copy_to_master.sh scripts/copy_data_to_hdfs.sh .
-./ssh/run_command_on_master.sh copy_data_to_hdfs.sh
+./ssh/run_command_on_master.sh ./copy_data_to_hdfs.sh
 ```
 
 - Sao chép thư mục chứa mã nguồn lên master:
@@ -221,9 +216,14 @@ Truy cập [http://localhost:3000](http://localhost:3000), đăng nhập bằng 
 ./ssh/copy_to_master.sh source/notebooks .
 ```
 
-- Sao chép các thư viện cần thiết cho việc chạy mã nguồn lên master:
+- Sao chép các thư viện cần thiết cho việc chạy mã nguồn lên các máy chủ:
 ```sh
-./ssh/copy_to_master.sh libs/third-party-jars libs/spark-3.1.1-bin-hadoop3.2/
+./ssh/copy_to_all.sh libs/third-party-jars libs/spark-3.1.1-bin-hadoop3.2/
+```
+
+- Cài đặt các thư viện cần thiết:
+```sh
+./ssh/run_command_on_all.sh "pip3 install findspark pytz"
 ```
 
 - Truy cập Jupyter Notebook, sau đó mở tập tin `stream-job.ipynb`. Sau đó, ở thanh công cụ phía trên màn hình, chọn `Cell > Run All`.<br>

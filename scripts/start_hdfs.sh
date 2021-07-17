@@ -15,4 +15,8 @@ $HADOOP_HOME/bin/hdfs namenode -format
 # Start hdfs
 $HADOOP_HOME/sbin/start-dfs.sh
 
+PUBLIC_IP=$(curl -s ipinfo.io/ip)
+echo -e "\n🏭 Access using public IP: http://$PUBLIC_IP:9870/"
+echo -e "\n🏭 Access using local: http://locahost:9870/"
+
 exit 0

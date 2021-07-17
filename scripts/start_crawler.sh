@@ -18,16 +18,16 @@ export NODE_HOME=$(pwd)/libs/node-v14.17.3-linux-x64
 export PATH=$NODE_HOME/bin:$PATH
 
 cd crawler
-mkdir logs
+mkdir -p logs
 
-$NODE_HOME/bin/npm install
+$NODE_HOME/bin/npm install --unsafe-perm
 
 export WAIT_TIME_MS_BEFORE_START=5000
 export BOOTSTRAP_SERVERS=localhost:9092 
 export TOPIC=buses-location 
 export CRAWL_INTERVAL_MS=15000 
 
-nohup $NODE_HOME/bin/node index.js > logs/crawler.logs &
+nohup $NODE_HOME/bin/node index.js > logs/crawler.logs 2> logs/crawler.logs &
 
 pid=$(ps aux | grep '[n]ode index.js' | awk '{print $2}')
 

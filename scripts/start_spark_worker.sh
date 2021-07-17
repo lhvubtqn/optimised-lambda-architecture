@@ -24,7 +24,10 @@ export JAVA_HOME=$(pwd)/libs/jdk-11.0.11
 export SPARK_HOME=$(pwd)/libs/spark-3.1.1-bin-hadoop3.2
 export PATH=$SPARK_HOME/bin:$PATH
 
+# Stop worker if exist
+$SPARK_HOME/sbin/stop-worker.sh > /dev/null 2> /dev/null
+
 # Start Spark Master
-SPARK_WORKER_MEMORY=3g SPARK_WORKER_PORT=7070 $SPARK_HOME/sbin/start-worker.sh spark://$MASTER_INTERNAL_ADDRESS:7077
+SPARK_LOCAL_IP=$WORKER_INTERNAL_ADDRESS SPARK_WORKER_MEMORY=3g SPARK_WORKER_PORT=7070 $SPARK_HOME/sbin/start-worker.sh spark://$MASTER_INTERNAL_ADDRESS:7077
 
 exit 0

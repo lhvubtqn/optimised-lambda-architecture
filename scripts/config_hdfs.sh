@@ -17,7 +17,12 @@ fi
 export JAVA_HOME=$(pwd)/libs/jdk-11.0.11
 export HADOOP_HOME=$(pwd)/libs/hadoop-3.2.2
 
-echo "export JAVA_HOME=$JAVA_HOME" >> $HADOOP_HOME/etc/hadoop/hadoop-env.sh
+echo "
+export JAVA_HOME=$JAVA_HOME
+export HDFS_NAMENODE_USER=$SSH_USERNAME
+export HDFS_DATANODE_USER=$SSH_USERNAME
+export HDFS_SECONDARYNAMENODE_USER=$SSH_USERNAME
+" > $HADOOP_HOME/etc/hadoop/hadoop-env.sh
 
 echo '<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
@@ -29,6 +34,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>
 </configuration>
 ' > $HADOOP_HOME/etc/hadoop/core-site.xml
 
+rm -rf $HADOOP_HOME/data/
 mkdir -p $HADOOP_HOME/data/{namenode,datanode}
 echo '<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
@@ -44,6 +50,10 @@ echo '<?xml version="1.0" encoding="UTF-8"?>
     <property>
       <name>dfs.replication</name>
       <value>1</value>
+    </property>
+    <property>
+      <name>dfs.namenode.datanode.registration.ip-hostname-check</name>
+      <value>false</value>
     </property>
 </configuration>
 ' > $HADOOP_HOME/etc/hadoop/hdfs-site.xml 
