@@ -18,3 +18,6 @@ services:
       - 3000:3000
     volumes:
       - lambda-grafana-storage:/var/lib/grafana
+    environment:
+      - TERM=linux
+      - GF_INSTALL_PLUGINS=grafana-worldmap-panel
