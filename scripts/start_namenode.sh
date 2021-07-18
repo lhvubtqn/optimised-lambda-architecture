@@ -21,6 +21,9 @@ export JAVA_HOME=$(pwd)/libs/jdk-11.0.11
 export HADOOP_HOME=$(pwd)/libs/hadoop-3.2.2
 export PATH=$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH
 
+# Stop namenode if exists
+$HADOOP_HOME/bin/hdfs --daemon stop namenode > /dev/null 2> /dev/null
+
 echo "
 export JAVA_HOME=$JAVA_HOME
 export HDFS_NAMENODE_USER=$SSH_USERNAME

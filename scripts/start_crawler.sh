@@ -27,6 +27,9 @@ export BOOTSTRAP_SERVERS=localhost:9092
 export TOPIC=buses-location 
 export CRAWL_INTERVAL_MS=15000 
 
+# Stop other crawler(s) if exist
+ps aux | grep '[n]ode index.js' | awk '{print $2}' | xargs kill -9
+
 nohup $NODE_HOME/bin/node index.js > logs/crawler.logs 2> logs/crawler.logs &
 
 pid=$(ps aux | grep '[n]ode index.js' | awk '{print $2}')

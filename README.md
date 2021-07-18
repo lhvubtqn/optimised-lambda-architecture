@@ -12,11 +12,9 @@ Hệ thống sử dụng trong luận văn được cài đặt trên ba máy ch
 
 - `MASTER_ADDRESS`: Địa chỉ public của máy master.
 - `MASTER_INTERNAL_ADDRESS`: Địa chỉ nội bộ của máy master. Các máy worker cần phân giải được địa chỉ này và truy cập được tất cả các port sử dụng địa chỉ này.
-- `MASTER_HOSTNAME`: Tên máy master.
 - `WORKER_NUM`: Số lượng máy worker.
 - `WORKER_ADDRESS_<i>`: Địa chỉ máy worker thứ `i`.
 - `WORKER_INTERNAL_ADDRESS_<i>`: Địa chỉ nội bộ của máy worker thứ `i`. Máy master cần phân giải được địa chỉ này và truy cập được tất cả các port sử dụng địa chỉ này.
-- `WORKER_HOSTNAME_<i>`: Tên máy worker thứ `i`.
 - `SSH_USERNAME`: Tên tài khoản dùng để truy cập các máy chủ.
 - `SSH_KEY_PATH`: Đường dẫn đến tập tin khoá bảo mật (private key) để truy cập đến các máy chủ. Trên các máy chủ cần có các tệp khóa công khai (public key) để xác nhận sự truy cập.
 
@@ -221,17 +219,9 @@ Truy cập [http://localhost:3000](http://localhost:3000), đăng nhập bằng 
 
 Hệ thống có thể được mở rộng bằng cách thêm vào một hay nhiều máy worker. Cách thêm một máy worker vào hệ thống như sau:
 
-- Thêm vào tập tin hosts của các máy chủ còn lại về thông tin của máy worker mới, với định dạng `<địa chỉ nội bộ> <tên máy chủ>`. Chạy câu lệnh dưới với `WORKER_INTERNAL_ADDRESS` và `WORKER_HOSTNAME` được thay bằng các giá trị phù hợp:
-
-```sh
-./ssh/run_command_on_all.sh "echo '<WORKER_INTERNAL_ADDRESS> <WORKER_HOSTNAME>' >> /etc/hosts"
-```
-
-- Điều chỉnh tập tin [ssh/constants.cfg](./ssh/constants.cfg), tăng giá trị biến `WORKER_NUM` lên 1 đơn vị, sau đó thêm vào 2 biến mới:
-
+- Điều chỉnh tập tin [ssh/constants.cfg](./ssh/constants.cfg), tăng giá trị biến `WORKER_NUM` lên 1 đơn vị, sau đó thêm vào:
     - `WORKER_ADDRESS_<i>`: Địa chỉ công khai (public ip) của máy worker được thêm vào với `i = WORKER_NUM`.
     - `WORKER_INTERNAL_ADDRESS_<i>`: Địa chỉ nội bộ của của máy worker được thêm vào với `i = WORKER_NUM`. Chú ý rằng máy master phải truy cập được vào địa chỉ này ở tất cả các port.
-    - `WORKER_HOSTNAME_<i>`: Tên máy worker được thêm vào với `i = WORKER_NUM`.
 
 - Sao chép tập tin [ssh/constants.cfg](./ssh/constants.cfg) lên các máy chủ:
 
@@ -262,19 +252,18 @@ Hệ thống có thể được mở rộng bằng cách thêm vào một hay nh
 ./ssh/copy_to_worker.sh <WORKER_NUM> libs/third-party-jars libs/spark-3.1.1-bin-hadoop3.2/
 ```
 
-- Chạy Spark Worker:
-
-```sh
-./ssh/copy_to_worker.sh <WORKER_NUM> scripts/start_spark_worker.sh .
-./ssh/copy_to_worker.sh <WORKER_NUM> scripts/start_spark_worker.sh .
-./ssh/run_command_on_worker.sh <WORKER_NUM> ./start_spark_worker.sh
-```
-
 - Chạy HDFS DataNode:
 
 ```sh
 ./ssh/copy_to_worker.sh <WORKER_NUM> scripts/start_datanode.sh .
 ./ssh/run_command_on_worker.sh <WORKER_NUM> ./start_datanode.sh -format
+```
+
+- Chạy Spark Worker:
+
+```sh
+./ssh/copy_to_worker.sh <WORKER_NUM> scripts/start_spark_worker.sh .
+./ssh/run_command_on_worker.sh <WORKER_NUM> ./start_spark_worker.sh
 ```
 
 
