@@ -26,6 +26,7 @@ echo -e "\n🏭 Starting Zookeeper..."
 nohup bin/zookeeper-server-start.sh config/zookeeper.properties > logs/zookeeper.logs 2> logs/zookeeper.logs &
 
 echo -e "\n🏭 Starting Kafka..."
+echo "advertised.listeners=PLAINTEXT://$MASTER_INTERNAL_ADDRESS:9092" >> config/server.properties
 nohup bin/kafka-server-start.sh config/server.properties > logs/kafka.logs 2> logs/kafka.logs&
 
 echo -e "\n⏳ Waiting for Kafka Broker to be up and running"

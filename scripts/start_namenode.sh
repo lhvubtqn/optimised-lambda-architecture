@@ -1,10 +1,9 @@
 #!/bin/bash
 
-# Usage: ./config_hdfs.sh [-format]
-# Config HDFS. If -format provided, will delete old data.
-
-
 cd "$(dirname "$0")"
+
+# Usage: ./start_namenode.sh [-format]
+# Config HDFS. If -format provided, will delete old data & format namenode.
 
 . constants.cfg
 
@@ -20,6 +19,7 @@ fi
 # Export environment
 export JAVA_HOME=$(pwd)/libs/jdk-11.0.11
 export HADOOP_HOME=$(pwd)/libs/hadoop-3.2.2
+export PATH=$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH
 
 echo "
 export JAVA_HOME=$JAVA_HOME
@@ -71,5 +71,18 @@ for i in $(eval echo "{1..$WORKER_NUM}"); do
     WORKER_INTERNAL_ADDRESS="WORKER_INTERNAL_ADDRESS_${i}"
     echo "${!WORKER_INTERNAL_ADDRESS}" >> $HADOOP_HOME/etc/hadoop/workers
 done
+
+
+if [[ "$1" == "-format" ]]; then
+    # Format hdfs namenode
+    $HADOOP_HOME/bin/hdfs namenode -format
+fi
+
+# Start namenode
+$HADOOP_HOME/bin/hdfs --daemon start namenode
+
+PUBLIC_IP=$(curl -s ipinfo.io/ip)
+echo -e "\n🏭 Access using public IP: http://$PUBLIC_IP:9870/"
+echo -e "\n🏭 Access using local: http://locahost:9870/"
 
 exit 0

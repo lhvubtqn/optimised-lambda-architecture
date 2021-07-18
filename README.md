@@ -12,9 +12,11 @@ Hệ thống sử dụng trong luận văn được cài đặt trên ba máy ch
 
 - `MASTER_ADDRESS`: Địa chỉ public của máy master.
 - `MASTER_INTERNAL_ADDRESS`: Địa chỉ nội bộ của máy master. Các máy worker cần phân giải được địa chỉ này và truy cập được tất cả các port sử dụng địa chỉ này.
+- `MASTER_HOSTNAME`: Tên máy master.
 - `WORKER_NUM`: Số lượng máy worker.
 - `WORKER_ADDRESS_<i>`: Địa chỉ máy worker thứ `i`.
 - `WORKER_INTERNAL_ADDRESS_<i>`: Địa chỉ nội bộ của máy worker thứ `i`. Máy master cần phân giải được địa chỉ này và truy cập được tất cả các port sử dụng địa chỉ này.
+- `WORKER_HOSTNAME_<i>`: Tên máy worker thứ `i`.
 - `SSH_USERNAME`: Tên tài khoản dùng để truy cập các máy chủ.
 - `SSH_KEY_PATH`: Đường dẫn đến tập tin khoá bảo mật (private key) để truy cập đến các máy chủ. Trên các máy chủ cần có các tệp khóa công khai (public key) để xác nhận sự truy cập.
 
@@ -95,35 +97,16 @@ Luận văn sử dụng Jupyter Notebook để làm công cụ chỉnh sửa mã
 ### Triển khai hệ thống quản lý tập tin phân tán HDFS
 HDFS gồm một tác vụ NameNode trên máy master và một tác vụ DataNode trên mỗi máy worker.
 
-Để triển khai HDFS trên các DataNode, máy chủ master cần phải truy cập được vào các máy chủ worker bằng SSH.
-
-- Tạo ra một cặp khóa:
-```sh
-ssh-keygen -b 4096 -t rsa -f ssh/id_rsa -q -N ""
+- Chạy NameNode:
+```
+./ssh/copy_to_master.sh scripts/start_namenode.sh .
+./ssh/run_command_on_master.sh ./start_namenode.sh -format
 ```
 
-- Copy khóa bảo mật lên máy master:
-```sh
-./ssh/copy_to_master.sh "ssh/id_rsa ssh/id_rsa.pub" .ssh/
-./ssh/run_command_on_master.sh "cat .ssh/id_rsa.pub >> .ssh/authorized_keys"
+- Chạy DataNode:
 ```
-
-- Copy khóa công khai lên các máy worker và cho phép master truy cập:
-```sh
-./ssh/copy_to_workers.sh ssh/id_rsa.pub .ssh/
-./ssh/run_command_on_workers.sh "cat .ssh/id_rsa.pub >> .ssh/authorized_keys"
-```
-
-- Config các máy chủ:
-```
-./ssh/copy_to_all.sh scripts/config_hdfs.sh .
-./ssh/run_command_on_all.sh ./config_hdfs.sh
-```
-
-- Chạy HDFS:
-```
-./ssh/copy_to_master.sh scripts/start_hdfs.sh .
-./ssh/run_command_on_master.sh ./start_hdfs.sh
+./ssh/copy_to_workers.sh scripts/start_datanode.sh .
+./ssh/run_command_on_workers.sh ./start_datanode.sh -format
 ```
 
 - Dùng port-forwarding để điều hướng các yêu cầu đến master:
@@ -226,11 +209,72 @@ Truy cập [http://localhost:3000](http://localhost:3000), đăng nhập bằng 
 ./ssh/run_command_on_all.sh "pip3 install findspark pytz"
 ```
 
-- Truy cập Jupyter Notebook, sau đó mở tập tin `stream-job.ipynb`. Sau đó, ở thanh công cụ phía trên màn hình, chọn `Cell > Run All`.<br>
-![images/notebook-1.png](images/notebook-1.png)
----
-**NOTE** Cần điều chỉnh hostname của các biến tĩnh trong tập tin cho phù hợp với môi trường thực thi trước khi chạy.
+### Chạy mã nguồn
 
+- Truy cập Jupyter Notebook, sau đó mở tập tin `stream-job.ipynb`. Điều chỉnh giả trị của `MASTER_ADDRESS` - địa chỉ của máy master, cho phù hợp với hệ thống hiện tại. Chú ý rằng các máy worker cần phải truy cập được địa chỉ này trên tất cả các port.<br>
 ![images/notebook-2.png](images/notebook-2.png)
 
----
+- Ở thanh công cụ phía trên màn hình, chọn `Cell > Run All`.<br>
+![images/notebook-1.png](images/notebook-1.png)
+
+## Mở rộng hệ thống
+
+Hệ thống có thể được mở rộng bằng cách thêm vào một hay nhiều máy worker. Cách thêm một máy worker vào hệ thống như sau:
+
+- Thêm vào tập tin hosts của các máy chủ còn lại về thông tin của máy worker mới, với định dạng `<địa chỉ nội bộ> <tên máy chủ>`. Chạy câu lệnh dưới với `WORKER_INTERNAL_ADDRESS` và `WORKER_HOSTNAME` được thay bằng các giá trị phù hợp:
+
+```sh
+./ssh/run_command_on_all.sh "echo '<WORKER_INTERNAL_ADDRESS> <WORKER_HOSTNAME>' >> /etc/hosts"
+```
+
+- Điều chỉnh tập tin [ssh/constants.cfg](./ssh/constants.cfg), tăng giá trị biến `WORKER_NUM` lên 1 đơn vị, sau đó thêm vào 2 biến mới:
+
+    - `WORKER_ADDRESS_<i>`: Địa chỉ công khai (public ip) của máy worker được thêm vào với `i = WORKER_NUM`.
+    - `WORKER_INTERNAL_ADDRESS_<i>`: Địa chỉ nội bộ của của máy worker được thêm vào với `i = WORKER_NUM`. Chú ý rằng máy master phải truy cập được vào địa chỉ này ở tất cả các port.
+    - `WORKER_HOSTNAME_<i>`: Tên máy worker được thêm vào với `i = WORKER_NUM`.
+
+- Sao chép tập tin [ssh/constants.cfg](./ssh/constants.cfg) lên các máy chủ:
+
+```sh
+./ssh/copy_to_all.sh ssh/constants.cfg .
+```
+
+- Cài đặt `Java` trên máy worker, với `WORKER_NUM` là số thứ tự của máy worker trong tập tin [ssh/constants.cfg](./ssh/constants.cfg):
+
+```sh
+./ssh/copy_to_worker.sh <WORKER_NUM> libs/jdk-11.0.11_linux-x64_bin.tar.gz libs/
+./ssh/run_command_on_worker.sh <WORKER_NUM> "
+    cd libs && \
+    tar -xf jdk-11.0.11_linux-x64_bin.tar.gz && \
+    rm jdk-11.0.11_linux-x64_bin.tar.gz
+"
+```
+
+- Cài đặt `pip3` và các thư viện cần thiết trên máy worker:
+```sh
+./ssh/run_command_on_worker.sh <WORKER_NUM> "sudo apt-get update && sudo apt-get install -y python3-pip"
+./ssh/run_command_on_worker.sh <WORKER_NUM> "pip3 install findspark pytz"
+```
+
+- Sao chép các thư viện cần thiết cho việc chạy mã nguồn lên các máy chủ:
+
+```sh
+./ssh/copy_to_worker.sh <WORKER_NUM> libs/third-party-jars libs/spark-3.1.1-bin-hadoop3.2/
+```
+
+- Chạy Spark Worker:
+
+```sh
+./ssh/copy_to_worker.sh <WORKER_NUM> scripts/start_spark_worker.sh .
+./ssh/copy_to_worker.sh <WORKER_NUM> scripts/start_spark_worker.sh .
+./ssh/run_command_on_worker.sh <WORKER_NUM> ./start_spark_worker.sh
+```
+
+- Chạy HDFS DataNode:
+
+```sh
+./ssh/copy_to_worker.sh <WORKER_NUM> scripts/start_datanode.sh .
+./ssh/run_command_on_worker.sh <WORKER_NUM> ./start_datanode.sh -format
+```
+
+
