@@ -1,6 +1,6 @@
 # Hướng dẫn cụ thể triển khai hệ thống
 
-Hệ thống sử dụng trong luận văn được cài đặt trên ba máy chủ ảo của Microsoft Azure, trong đó một máy chịu trách nhiệm chạy các tác vụ điều khiển và cơ sở dữ liệu, hai máy còn lại chạy tiến trình Spark Executor và HDFS DataNode. Chi tiết các tác vụ được trình bày trong hình sau:
+Hệ thống sử dụng trong luận văn được cài đặt trên các máy chủ ảo của DigitalOcean, trong đó một máy chịu trách nhiệm chạy các tác vụ điều khiển và cơ sở dữ liệu, các máy còn lại chạy tiến trình Spark Executor và HDFS DataNode. Chi tiết các tác vụ được trình bày trong hình sau:
 
 ![Deploy map](./images/deploy-map.png)
 
