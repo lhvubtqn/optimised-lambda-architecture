@@ -19,3 +19,5 @@ node_modules
 volumes
 
 .ipynb_checkpoints
+
+**/*.iml
