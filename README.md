@@ -6,6 +6,12 @@ Hệ thống sử dụng trong luận văn được cài đặt trên các máy 
 
 ## Triển khai các tác vụ
 
+---
+
+**NOTE** Các thao tác sau được nhóm tác giả thực hiện thành công trên hệ điều hành Ubuntu 18.04 LTS.
+
+---
+
 ### Thiết lập các thông số cần thiết
 
 Ở tệp tin [ssh/constants.cfg](./ssh/constants.cfg), điều chỉnh các thông số cho phù hợp với môi trường triển khai hệ thống. Trong đó:
